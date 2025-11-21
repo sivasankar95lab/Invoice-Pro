@@ -2,7 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { Storage } from "./storage";
 
 export const getBusinessInsights = async (): Promise<string> => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const apiKey = process.env.API_KEY;
   
   if (!apiKey) {
     return "API Key is missing. Please configure process.env.API_KEY.";
