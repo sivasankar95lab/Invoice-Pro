@@ -6,7 +6,8 @@ import {
   Plus, Trash2, Edit, Save, Printer, Search, 
   Download, Share2, MoreHorizontal, RefreshCcw,
   Sparkles, CheckCircle, AlertCircle, Upload, ArrowRightLeft,
-  Filter, Receipt, Mail, MessageCircle, Loader, Database, Copy
+  Filter, Receipt, Mail, MessageCircle, Loader, Database, Copy,
+  ZoomIn, ZoomOut
 } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line 
@@ -447,6 +448,7 @@ const Logs = () => {
 const PrintTemplate = ({ doc, companies, customers, printType, onClose }: any) => {
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [isUpiQr, setIsUpiQr] = useState(false);
+  const [scale, setScale] = useState(0.9);
 
   if (!doc) return null;
 
@@ -509,186 +511,214 @@ const PrintTemplate = ({ doc, companies, customers, printType, onClose }: any) =
   }, [doc, company, customer, grandTotal, printType]);
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center overflow-y-auto p-4 print:p-0 print:bg-white print:static print:block">
-      <div className="bg-white w-[210mm] min-h-[297mm] shadow-2xl mx-auto relative print:shadow-none print:w-full">
-        <button onClick={onClose} className="absolute top-4 right-4 bg-red-100 p-2 rounded-full text-red-600 hover:bg-red-200 print:hidden">
-          <X size={24} />
-        </button>
-        <button onClick={() => window.print()} className="absolute top-4 right-16 bg-emerald-100 p-2 rounded-full text-emerald-600 hover:bg-emerald-200 print:hidden">
-          <Printer size={24} />
-        </button>
+    <div className="fixed inset-0 bg-slate-900/95 z-50 overflow-y-auto print:bg-white print:static print:block text-left">
+      
+      {/* Floating Controls - Right Middle */}
+      <div className="fixed right-6 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-50 print:hidden">
+         <div className="bg-white/10 backdrop-blur border border-white/20 p-1.5 rounded-xl flex flex-col gap-1 shadow-xl">
+            <button onClick={() => setScale(s => Math.min(s + 0.1, 2.0))} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors" title="Zoom In">
+               <ZoomIn size={20} />
+            </button>
+            <div className="text-center text-xs font-medium text-white/80 py-1 select-none">
+               {Math.round(scale * 100)}%
+            </div>
+            <button onClick={() => setScale(s => Math.max(s - 0.1, 0.4))} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors" title="Zoom Out">
+               <ZoomOut size={20} />
+            </button>
+         </div>
+         <div className="bg-white/10 backdrop-blur border border-white/20 p-1.5 rounded-xl flex flex-col gap-1 shadow-xl mt-2">
+            <button onClick={() => window.print()} className="p-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors" title="Print">
+               <Printer size={20} />
+            </button>
+            <button onClick={onClose} className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors" title="Close">
+               <X size={20} />
+            </button>
+         </div>
+      </div>
 
-        <div className="p-10 h-full flex flex-col justify-between font-serif text-sm">
-          <div>
-            <div className="flex justify-between items-start border-b-2 border-emerald-700 pb-6 mb-6">
-              <div className="flex items-start gap-4 w-2/3">
-                 {company.logo && <img src={company.logo} alt="Logo" className="h-24 w-24 object-contain" />}
-                 <div className="flex flex-col justify-center">
-                   <h1 className="text-2xl font-bold text-emerald-900 uppercase leading-tight">{company.name}</h1>
-                   <p className="text-gray-600 whitespace-pre-line mt-2">{company.address}</p>
-                   <p className="text-gray-600 mt-1 font-medium">GSTIN: {company.gstin}</p>
-                   <p className="text-gray-600">Contact: {company.phone}</p>
-                 </div>
+      <div className="min-h-full w-full flex justify-center py-12 print:p-0 print:block">
+        <div 
+           className="bg-white shadow-2xl print:shadow-none print:w-full origin-top transition-transform duration-200"
+           style={{
+              width: '210mm',
+              minHeight: '297mm',
+              transform: `scale(${scale})`,
+              // Add margin bottom to allow scrolling if scaled up
+              marginBottom: scale > 1 ? `${(scale - 1) * 150}mm` : '0'
+           }}
+        >
+          <div className="p-10 h-full flex flex-col justify-between font-serif text-sm">
+            <div>
+              <div className="flex justify-between items-start border-b-2 border-emerald-700 pb-6 mb-6">
+                <div className="flex items-start gap-4 w-2/3">
+                   {company.logo && <img src={company.logo} alt="Logo" className="h-24 w-24 object-contain" />}
+                   <div className="flex flex-col justify-center">
+                     <h1 className="text-2xl font-bold text-emerald-900 uppercase leading-tight">{company.name}</h1>
+                     <p className="text-gray-600 whitespace-pre-line mt-2">{company.address}</p>
+                     <p className="text-gray-600 mt-1 font-medium">GSTIN: {company.gstin}</p>
+                     <p className="text-gray-600">Contact: {company.phone}</p>
+                   </div>
+                </div>
+                <div className="w-1/3 text-right">
+                  <h2 className="text-3xl font-bold text-emerald-700 mb-4">{titleMap[printType]}</h2>
+                  <p><strong>#:</strong> {doc.documentNumber}</p>
+                  <p><strong>Date:</strong> {formatDate(doc.date)}</p>
+                  {printType === PrintType.DELIVERY_CHALLAN && doc.transportMode && (
+                    <>
+                      <p><strong>Transport:</strong> {doc.transportMode}</p>
+                      <p><strong>Vehicle:</strong> {doc.vehicleNumber}</p>
+                    </>
+                  )}
+                </div>
               </div>
-              <div className="w-1/3 text-right">
-                <h2 className="text-3xl font-bold text-emerald-700 mb-4">{titleMap[printType]}</h2>
-                <p><strong>#:</strong> {doc.documentNumber}</p>
-                <p><strong>Date:</strong> {formatDate(doc.date)}</p>
-                {printType === PrintType.DELIVERY_CHALLAN && doc.transportMode && (
-                  <>
-                    <p><strong>Transport:</strong> {doc.transportMode}</p>
-                    <p><strong>Vehicle:</strong> {doc.vehicleNumber}</p>
-                  </>
+
+              <div className="bg-emerald-50 p-4 rounded-lg mb-8 border border-emerald-100">
+                <h3 className="text-emerald-800 font-bold mb-2">BILL TO:</h3>
+                <p className="font-semibold text-lg">{customer.companyName || customer.name}</p>
+                <p className="text-gray-600 whitespace-pre-line">{customer.address}</p>
+                {customer.gstin && <p className="mt-1">GSTIN: <span className="font-medium">{customer.gstin}</span></p>}
+                {customer.phone && <p>Contact: {customer.phone}</p>}
+              </div>
+
+              <table className="w-full mb-8 border-collapse">
+                <thead>
+                  <tr className="bg-emerald-700 text-white">
+                    <th className="p-3 text-left text-xs uppercase tracking-wider rounded-tl-md">#</th>
+                    <th className="p-3 text-left text-xs uppercase tracking-wider">Description</th>
+                    {!isQuotation && <th className="p-3 text-center text-xs uppercase tracking-wider">HSN/SAC</th>}
+                    <th className="p-3 text-center text-xs uppercase tracking-wider">Qty</th>
+                    {printType !== PrintType.DELIVERY_CHALLAN && (
+                      <>
+                        <th className="p-3 text-right text-xs uppercase tracking-wider">Rate</th>
+                        <th className="p-3 text-right text-xs uppercase tracking-wider">Disc.</th>
+                        {printType === PrintType.TAX_INVOICE && <th className="p-3 text-right text-xs uppercase tracking-wider">GST %</th>}
+                        <th className="p-3 text-right text-xs uppercase tracking-wider rounded-tr-md">Amount</th>
+                      </>
+                    )}
+                  </tr>
+                </thead>
+                <tbody className="text-gray-700">
+                  {doc.items.map((item: LineItem, index: number) => {
+                    const { discount, taxable } = calculateLineItem(item);
+                    return (
+                      <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="p-3">{index + 1}</td>
+                        <td className="p-3 font-medium">{item.description}</td>
+                        {!isQuotation && <td className="p-3 text-center">{item.hsnSac}</td>}
+                        <td className="p-3 text-center">{item.quantity}</td>
+                        {printType !== PrintType.DELIVERY_CHALLAN && (
+                          <>
+                            <td className="p-3 text-right">{formatCurrency(item.unitPrice)}</td>
+                            <td className="p-3 text-right text-red-500">{discount > 0 ? `-${formatCurrency(discount)}` : '-'}</td>
+                            {printType === PrintType.TAX_INVOICE && <td className="p-3 text-right">{item.gstRate}%</td>}
+                            <td className="p-3 text-right font-semibold">{formatCurrency(taxable)}</td>
+                          </>
+                        )}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+
+              {printType !== PrintType.DELIVERY_CHALLAN && (
+                <div className="flex justify-end mb-8">
+                  <div className="w-1/2 space-y-3 bg-gray-50 p-4 rounded-lg">
+                    <div className="flex justify-between text-gray-600">
+                      <span>Total Taxable Amount:</span>
+                      <span>{formatCurrency(taxable)}</span>
+                    </div>
+                    {printType === PrintType.TAX_INVOICE && (
+                      <div className="flex justify-between text-gray-600">
+                        <span>Total Tax:</span>
+                        <span>{formatCurrency(tax)}</span>
+                      </div>
+                    )}
+                     {doc.globalDiscountValue > 0 && (
+                      <div className="flex justify-between text-red-600">
+                        <span>Additional Discount:</span>
+                        <span>-{formatCurrency(doc.globalDiscountValue)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between font-bold text-xl text-emerald-800 pt-3 border-t border-gray-300">
+                      <span>Grand Total:</span>
+                      <span>{formatCurrency(grandTotal)}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {printType !== PrintType.DELIVERY_CHALLAN && (
+                <div className="mb-8 flex gap-6 items-start">
+                   <div className="flex-1">
+                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Amount in Words</p>
+                     <p className="italic text-gray-800 font-medium bg-gray-50 p-2 rounded">{numberToWords(Math.round(grandTotal))}</p>
+                   </div>
+                   
+                   {!isQuotation && company.bankName && (
+                      <div className="flex-1 bg-gray-50 p-3 rounded border border-gray-100 text-sm">
+                         <p className="font-bold text-emerald-800 mb-1">Bank Details</p>
+                         <p><span className="font-medium">Bank:</span> {company.bankName}</p>
+                         <p><span className="font-medium">A/C No:</span> {company.accountNumber}</p>
+                         <p><span className="font-medium">IFSC:</span> {company.ifsc}</p>
+                         {company.branch && <p><span className="font-medium">Branch:</span> {company.branch}</p>}
+                         {company.vpa && <p><span className="font-medium">UPI ID:</span> {company.vpa}</p>}
+                      </div>
+                   )}
+                   
+                   <div className="flex-none">
+                      {qrCodeUrl && (
+                        <div className="flex flex-col items-center">
+                          <div className="relative border border-gray-200 p-1 rounded bg-white">
+                             <img src={qrCodeUrl} alt="Scan QR" className="w-24 h-24" />
+                             {isUpiQr && (
+                               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                 <div className="bg-white p-0.5 rounded-sm shadow-sm">
+                                   <img 
+                                     src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" 
+                                     alt="UPI" 
+                                     className="w-6 h-6 object-contain"
+                                   />
+                                 </div>
+                               </div>
+                             )}
+                          </div>
+                          <p className="text-[10px] text-center text-gray-500 mt-1 font-mono">
+                            {isUpiQr ? company.vpa : "Scan Me"}
+                          </p>
+                        </div>
+                      )}
+                   </div>
+                </div>
+              )}
+
+              <div className="text-xs text-gray-500 mt-4 border-t pt-4">
+                <h4 className="font-bold text-gray-700 mb-2">Terms & Conditions:</h4>
+                {termsContent ? (
+                   <p className="whitespace-pre-line">{termsContent}</p>
+                ) : (
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>Goods once sold will not be taken back.</li>
+                    <li>Interest @18% p.a. will be charged if payment is delayed.</li>
+                    <li>Subject to local jurisdiction.</li>
+                  </ul>
                 )}
               </div>
             </div>
 
-            <div className="bg-emerald-50 p-4 rounded-lg mb-8 border border-emerald-100">
-              <h3 className="text-emerald-800 font-bold mb-2">BILL TO:</h3>
-              <p className="font-semibold text-lg">{customer.companyName || customer.name}</p>
-              <p className="text-gray-600 whitespace-pre-line">{customer.address}</p>
-              {customer.gstin && <p className="mt-1">GSTIN: <span className="font-medium">{customer.gstin}</span></p>}
-              {customer.phone && <p>Contact: {customer.phone}</p>}
-            </div>
-
-            <table className="w-full mb-8 border-collapse">
-              <thead>
-                <tr className="bg-emerald-700 text-white">
-                  <th className="p-3 text-left text-xs uppercase tracking-wider rounded-tl-md">#</th>
-                  <th className="p-3 text-left text-xs uppercase tracking-wider">Description</th>
-                  {!isQuotation && <th className="p-3 text-center text-xs uppercase tracking-wider">HSN/SAC</th>}
-                  <th className="p-3 text-center text-xs uppercase tracking-wider">Qty</th>
-                  {printType !== PrintType.DELIVERY_CHALLAN && (
-                    <>
-                      <th className="p-3 text-right text-xs uppercase tracking-wider">Rate</th>
-                      <th className="p-3 text-right text-xs uppercase tracking-wider">Disc.</th>
-                      {printType === PrintType.TAX_INVOICE && <th className="p-3 text-right text-xs uppercase tracking-wider">GST %</th>}
-                      <th className="p-3 text-right text-xs uppercase tracking-wider rounded-tr-md">Amount</th>
-                    </>
-                  )}
-                </tr>
-              </thead>
-              <tbody className="text-gray-700">
-                {doc.items.map((item: LineItem, index: number) => {
-                  const { discount, taxable } = calculateLineItem(item);
-                  return (
-                    <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
-                      <td className="p-3">{index + 1}</td>
-                      <td className="p-3 font-medium">{item.description}</td>
-                      {!isQuotation && <td className="p-3 text-center">{item.hsnSac}</td>}
-                      <td className="p-3 text-center">{item.quantity}</td>
-                      {printType !== PrintType.DELIVERY_CHALLAN && (
-                        <>
-                          <td className="p-3 text-right">{formatCurrency(item.unitPrice)}</td>
-                          <td className="p-3 text-right text-red-500">{discount > 0 ? `-${formatCurrency(discount)}` : '-'}</td>
-                          {printType === PrintType.TAX_INVOICE && <td className="p-3 text-right">{item.gstRate}%</td>}
-                          <td className="p-3 text-right font-semibold">{formatCurrency(taxable)}</td>
-                        </>
-                      )}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-
-            {printType !== PrintType.DELIVERY_CHALLAN && (
-              <div className="flex justify-end mb-8">
-                <div className="w-1/2 space-y-3 bg-gray-50 p-4 rounded-lg">
-                  <div className="flex justify-between text-gray-600">
-                    <span>Total Taxable Amount:</span>
-                    <span>{formatCurrency(taxable)}</span>
-                  </div>
-                  {printType === PrintType.TAX_INVOICE && (
-                    <div className="flex justify-between text-gray-600">
-                      <span>Total Tax:</span>
-                      <span>{formatCurrency(tax)}</span>
-                    </div>
-                  )}
-                   {doc.globalDiscountValue > 0 && (
-                    <div className="flex justify-between text-red-600">
-                      <span>Additional Discount:</span>
-                      <span>-{formatCurrency(doc.globalDiscountValue)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between font-bold text-xl text-emerald-800 pt-3 border-t border-gray-300">
-                    <span>Grand Total:</span>
-                    <span>{formatCurrency(grandTotal)}</span>
-                  </div>
+            <div className="flex flex-col">
+              <div className="flex justify-end mt-10 mb-6">
+                <div className="text-center">
+                  {company.signature && <img src={company.signature} alt="Sig" className="h-16 object-contain mb-2 mx-auto" />}
+                  <p className="font-bold text-emerald-900">{company.name}</p>
+                  <p className="text-xs text-gray-500">Authorized Signatory</p>
                 </div>
               </div>
-            )}
-
-            {printType !== PrintType.DELIVERY_CHALLAN && (
-              <div className="mb-8 flex gap-6 items-start">
-                 <div className="flex-1">
-                   <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Amount in Words</p>
-                   <p className="italic text-gray-800 font-medium bg-gray-50 p-2 rounded">{numberToWords(Math.round(grandTotal))}</p>
-                 </div>
-                 
-                 {!isQuotation && company.bankName && (
-                    <div className="flex-1 bg-gray-50 p-3 rounded border border-gray-100 text-sm">
-                       <p className="font-bold text-emerald-800 mb-1">Bank Details</p>
-                       <p><span className="font-medium">Bank:</span> {company.bankName}</p>
-                       <p><span className="font-medium">A/C No:</span> {company.accountNumber}</p>
-                       <p><span className="font-medium">IFSC:</span> {company.ifsc}</p>
-                       {company.branch && <p><span className="font-medium">Branch:</span> {company.branch}</p>}
-                       {company.vpa && <p><span className="font-medium">UPI ID:</span> {company.vpa}</p>}
-                    </div>
-                 )}
-                 
-                 <div className="flex-none">
-                    {qrCodeUrl && (
-                      <div className="flex flex-col items-center">
-                        <div className="relative border border-gray-200 p-1 rounded bg-white">
-                           <img src={qrCodeUrl} alt="Scan QR" className="w-24 h-24" />
-                           {isUpiQr && (
-                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                               <div className="bg-white p-0.5 rounded-sm shadow-sm">
-                                 <img 
-                                   src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" 
-                                   alt="UPI" 
-                                   className="w-6 h-6 object-contain"
-                                 />
-                               </div>
-                             </div>
-                           )}
-                        </div>
-                        <p className="text-[10px] text-center text-gray-500 mt-1 font-mono">
-                          {isUpiQr ? company.vpa : "Scan Me"}
-                        </p>
-                      </div>
-                    )}
-                 </div>
+              <div className="border-t pt-4 text-center text-xs text-gray-400">
+                 <p className="mb-1">This is a computer generated {
+                    printType === PrintType.QUOTATION ? 'quotation' : 
+                    printType === PrintType.DELIVERY_CHALLAN ? 'delivery challan' : 'invoice'
+                 }.</p>
               </div>
-            )}
-
-            <div className="text-xs text-gray-500 mt-4 border-t pt-4">
-              <h4 className="font-bold text-gray-700 mb-2">Terms & Conditions:</h4>
-              {termsContent ? (
-                 <p className="whitespace-pre-line">{termsContent}</p>
-              ) : (
-                <ul className="list-disc list-inside space-y-1">
-                  <li>Goods once sold will not be taken back.</li>
-                  <li>Interest @18% p.a. will be charged if payment is delayed.</li>
-                  <li>Subject to local jurisdiction.</li>
-                </ul>
-              )}
-            </div>
-          </div>
-
-          <div className="flex flex-col">
-            <div className="flex justify-end mt-10 mb-6">
-              <div className="text-center">
-                {company.signature && <img src={company.signature} alt="Sig" className="h-16 object-contain mb-2 mx-auto" />}
-                <p className="font-bold text-emerald-900">{company.name}</p>
-                <p className="text-xs text-gray-500">Authorized Signatory</p>
-              </div>
-            </div>
-            <div className="border-t pt-4 text-center text-xs text-gray-400">
-               <p className="mb-1">This is a computer generated {
-                  printType === PrintType.QUOTATION ? 'quotation' : 
-                  printType === PrintType.DELIVERY_CHALLAN ? 'delivery challan' : 'invoice'
-               }.</p>
             </div>
           </div>
         </div>
