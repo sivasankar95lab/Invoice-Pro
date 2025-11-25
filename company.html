@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Pro - Company Management</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="asset/favicon239x250.png">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --secondary-color: #f5f7ff;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --text-color: #334155;
+            --border-color: #e2e8f0;
+            --sidebar-width: 280px;
+        }
+        
+        body {
+            background-color: var(--secondary-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background-color: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .sidebar-logo {
+            max-width: 200px;
+            height: auto;
+        }
+        
+        .sidebar-nav {
+            padding: 1.5rem 0;
+        }
+        
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+        }
+        
+        .nav-link.active {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .nav-link i {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 0;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            color: #64748b;
+        }
+        
+        /* Table Styles */
+        .table-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th {
+            background-color: var(--secondary-color);
+            font-weight: 600;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--border-color);
+            padding: 0.75rem;
+            text-align: left;
+        }
+        
+        .table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(74, 108, 247, 0.05);
+        }
+        
+        /* Search and Filter Styles */
+        .search-filter-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-control, .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+            outline: none;
+        }
+        
+        /* Button Styles */
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a5bd9;
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Company Logo */
+        .company-logo {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            max-width: 120px;
+            height: auto;
+            opacity: 0.7;
+            z-index: 100;
+        }
+        
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background-color: white;
+            border-radius: 8px;
+            padding: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Modal Styles */
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+        
+        .modal-title {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+        
+        /* Image Preview Styles */
+        .image-preview-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .image-preview {
+            width: 100px;
+            height: 100px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: var(--secondary-color);
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .image-preview .placeholder {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            text-align: center;
+            padding: 0.5rem;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+        
+        /* Loading overlay styles */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-spinner-large {
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.3rem;
+        }
+        
+        .loading-text {
+            margin-top: 1rem;
+            color: var(--text-color);
+            font-size: 1.1rem;
+        }
+        
+        /* Empty State Styles */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+        
+        .empty-state-text {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Company Card Styles */
+        .company-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .company-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .company-logo-small {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: contain;
+            background-color: var(--secondary-color);
+            padding: 0.5rem;
+        }
+        
+        .company-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .company-gstin {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 0.25rem;
+        }
+        
+        .company-address {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .company-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        /* Form Section Styles */
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .form-section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-section-title i {
+            font-size: 1.25rem;
+        }
+        
+        /* Badge Styles */
+        .badge {
+            padding: 0.375rem 0.75rem;
+            font-weight: 500;
+        }
+        
+        /* Copy Button Styles */
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 0.25rem;
+            transition: color 0.2s ease;
+        }
+        
+        .copy-btn:hover {
+            color: #3a5bd9;
+        }
+        
+        .copy-btn.copied {
+            color: var(--success-color);
+        }
+        
+        /* Address field styles */
+        .address-field {
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="bi bi-list fs-4"></i>
+    </button>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="asset/applogo345x150.png" alt="Invoice Pro" class="sidebar-logo">
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="company.html" class="nav-link active">
+                    <i class="bi bi-building"></i>
+                    <span>Company</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="customer.html" class="nav-link">
+                    <i class="bi bi-people"></i>
+                    <span>Customers</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="quotation.html" class="nav-link">
+                    <i class="bi bi-file-text"></i>
+                    <span>Quotations</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="invoice.html" class="nav-link">
+                    <i class="bi bi-receipt"></i>
+                    <span>Invoices</span>
+                </a>
+            </div>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="nav-item">
+                <div class="nav-link d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-wifi"></i> Online Status</span>
+                    <span id="onlineIndicator" class="badge rounded-pill bg-secondary">Checking...</span>
+                </div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-link d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-cloud"></i> Remote DB</span>
+                    <span id="remoteDbIndicator" class="badge rounded-pill bg-secondary">Checking...</span>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link" id="refreshBtn">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>Refresh</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="index.html" class="nav-link" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Company Management</h1>
+                <p class="page-subtitle">Manage your company profiles and business information</p>
+            </div>
+            <button class="btn btn-primary" id="addCompanyBtn">
+                <i class="bi bi-plus-circle me-2"></i>Add Company
+            </button>
+        </div>
+        
+        <!-- Search and Filter -->
+        <div class="search-filter-container">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search by name, GSTIN, PAN, Bank, Address...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="filterSelect">
+                        <option value="">All Companies</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-outline-primary w-100" id="clearFilterBtn">
+                        <i class="bi bi-x-circle me-2"></i>Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Companies Table -->
+        <div class="table-container">
+            <div id="companiesTableContainer">
+                <!-- Table will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Company Logo -->
+    <img src="asset/slablogo.png" alt="Company Logo" class="company-logo">
+    
+    <!-- Company Modal -->
+    <div class="modal fade" id="companyModal" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="companyModalLabel">Add Company</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="companyForm">
+                        <input type="hidden" id="companyId">
+                        
+                        <!-- Basic Information Section -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">
+                                <i class="bi bi-building"></i>
+                                Basic Information
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="companyName" class="form-label">Company Name *</label>
+                                    <input type="text" class="form-control" id="companyName" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="companyEmail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="companyEmail">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="companyPhone" class="form-label">Phone</label>
+                                    <input type="tel" class="form-control" id="companyPhone">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="companyWebsite" class="form-label">Website</label>
+                                    <input type="url" class="form-control" id="companyWebsite">
+                                </div>
+                                <div class="col-12">
+                                    <label for="companyAddress" class="form-label">Complete Address</label>
+                                    <textarea class="form-control address-field" id="companyAddress" rows="4"></textarea>
+                                                                    </div>
+                                <div class="col-md-6">
+                                    <label for="companyGSTIN" class="form-label">GSTIN</label>
+                                    <input type="text" class="form-control" id="companyGSTIN" maxlength="15">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="companyPAN" class="form-label">PAN</label>
+                                    <input type="text" class="form-control" id="companyPAN" maxlength="10">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="companyLogo" class="form-label">Company Logo</label>
+                                    <input type="file" class="form-control" id="companyLogo" accept="image/*">
+                                    <div class="image-preview-container">
+                                        <div class="image-preview" id="logoPreview">
+                                            <div class="placeholder">No logo</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="companySignature" class="form-label">Signature</label>
+                                    <input type="file" class="form-control" id="companySignature" accept="image/*">
+                                    <div class="image-preview-container">
+                                        <div class="image-preview" id="signaturePreview">
+                                            <div class="placeholder">No signature</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label for="companyNotes" class="form-label">Notes</label>
+                                    <textarea class="form-control" id="companyNotes" rows="3"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="companyStatus" class="form-label">Status</label>
+                                    <select class="form-select" id="companyStatus">
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Bank Details Section -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">
+                                <i class="bi bi-bank"></i>
+                                Bank Details
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="bankName" class="form-label">Bank Name</label>
+                                    <input type="text" class="form-control" id="bankName">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="accountName" class="form-label">Account Holder Name</label>
+                                    <input type="text" class="form-control" id="accountName">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="accountNumber" class="form-label">Account Number</label>
+                                    <input type="text" class="form-control" id="accountNumber">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="ifscCode" class="form-label">IFSC Code</label>
+                                    <input type="text" class="form-control" id="ifscCode" maxlength="11">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="branchName" class="form-label">Branch Name</label>
+                                    <input type="text" class="form-control" id="branchName">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="accountType" class="form-label">Account Type</label>
+                                    <select class="form-select" id="accountType">
+                                        <option value="">Select Account Type</option>
+                                        <option value="savings">Savings Account</option>
+                                        <option value="current">Current Account</option>
+                                        <option value="overdraft">Overdraft Account</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- UPI Details Section -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">
+                                <i class="bi bi-phone"></i>
+                                UPI Details
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="upiId" class="form-label">UPI ID</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="upiId" placeholder="example@upi">
+                                        <button class="btn btn-outline-secondary copy-btn" type="button" data-copy="upiId" title="Copy UPI ID">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="upiQrCode" class="form-label">UPI QR Code</label>
+                                    <input type="file" class="form-control" id="upiQrCode" accept="image/*">
+                                    <div class="image-preview-container">
+                                        <div class="image-preview" id="upiQrPreview">
+                                            <div class="placeholder">No QR code</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveCompanyBtn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this company? This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border text-primary loading-spinner-large" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="loading-text">Loading...</div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- LocalForage -->
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize localForage
+            localforage.config({
+                name: 'InvoiceProDB',
+                storeName: 'data'
+            });
+            (function(){
+                const SUPABASE_URL = 'https://nnazbmwzqvzzuyecvlik.supabase.co';
+                const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uYXpibXd6cXZ6enV5ZWN2bGlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MzAwNzksImV4cCI6MjA3OTIwNjA3OX0.ENU4UT-QnWL2G1D3Lvpq-YLDgnorqJaeEgChirwaV28';
+                const remoteTables = ['companies','customers','invoices','quotations'];
+                const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+                async function verifyRemoteSetup(){
+                    if (!sb) return;
+                    if (localStorage.getItem('supabase_setup_shown')==='1') return;
+                    try {
+                        const { data, error } = await sb.from('app_store').select('key').limit(1);
+                        if (error) {
+                            showSupabaseSetupModal(error.message || 'Remote not accessible');
+                            localStorage.setItem('supabase_setup_shown','1');
+                        }
+                    } catch (err) {
+                        showSupabaseSetupModal(err && err.message ? err.message : 'Remote not accessible');
+                        localStorage.setItem('supabase_setup_shown','1');
+                    }
+                }
+                function showSupabaseSetupModal(reason){
+                    if (!document.getElementById('supabaseSetupModal')){
+                        const div = document.createElement('div');
+                        div.innerHTML = (
+                            '<div class="modal fade" id="supabaseSetupModal" tabindex="-1" aria-hidden="true">'
+                            + '<div class="modal-dialog modal-lg modal-dialog-scrollable">'
+                            + '<div class="modal-content">'
+                            + '<div class="modal-header">'
+                            + '<h5 class="modal-title">Supabase Setup Required</h5>'
+                            + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'
+                            + '</div>'
+                            + '<div class="modal-body">'
+                            + '<p>Remote database is not ready. Reason: ' + String(reason) + '</p>'
+                            + '<p>Steps to configure your Supabase project:</p>'
+                            + '<ol>'
+                            + '<li>Open SQL editor in Supabase.</li>'
+                            + '<li>Create the table in the public schema:</li>'
+                            + '</ol>'
+                            + '<pre><code>create table if not exists public.app_store (\n  key text primary key,\n  value jsonb not null\n);\nalter table public.app_store enable row level security;\ncreate policy "Allow read to anon" on public.app_store for select using (true);\ncreate policy "Allow insert to anon" on public.app_store for insert with check (true);\ncreate policy "Allow update to anon" on public.app_store for update using (true) with check (true);\ncreate policy "Allow delete to anon" on public.app_store for delete using (true);\n</code></pre>'
+                            + '<p>Ensure the anon public key is enabled for your project and the policies allow reads and writes.</p>'
+                            + '</div>'
+                            + '<div class="modal-footer">'
+                            + '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                        );
+                        document.body.appendChild(div);
+                    }
+                    const modalEl = document.getElementById('supabaseSetupModal');
+                    if (window.bootstrap && window.bootstrap.Modal) {
+                        const modal = new window.bootstrap.Modal(modalEl);
+                        modal.show();
+                    } else {
+                        modalEl.style.display = 'block';
+                    }
+                }
+                async function remoteGet(key){ try { if (!sb || remoteTables.indexOf(key)===-1) return null; const { data, error } = await sb.from('app_store').select('value').eq('key', key); if (error) return null; return Array.isArray(data)&&data.length?data[0].value:null; } catch(_) { return null; } }
+                async function remoteUpsert(key,value){ try { if (!sb || remoteTables.indexOf(key)===-1) return; await sb.from('app_store').upsert({ key, value }, { onConflict: 'key' }); } catch(_) {} }
+                const originalGetItem = localforage.getItem.bind(localforage);
+                const originalSetItem = localforage.setItem.bind(localforage);
+                localforage.getItem = async function(key){ const remote = await remoteGet(key); if (remote!==null && remote!==undefined){ await originalSetItem(key, remote); return remote; } return originalGetItem(key); };
+                localforage.setItem = async function(key,value){ await remoteUpsert(key,value); return originalSetItem(key,value); };
+                verifyRemoteSetup();
+                function updateOnlineIndicator(){
+                    const el = document.getElementById('onlineIndicator');
+                    if (!el) return;
+                    const online = navigator.onLine;
+                    el.textContent = online ? 'Online' : 'Offline';
+                    el.classList.remove('bg-secondary','bg-success','bg-danger');
+                    el.classList.add(online ? 'bg-success' : 'bg-danger');
+                }
+                async function updateRemoteDbIndicator(){
+                    const el = document.getElementById('remoteDbIndicator');
+                    if (!el) return;
+                    try {
+                        if (!sb) { el.textContent = 'Offline'; el.classList.remove('bg-secondary','bg-success','bg-danger'); el.classList.add('bg-danger'); return; }
+                        const { error } = await sb.from('app_store').select('key').limit(1);
+                        const ok = !error;
+                        el.textContent = ok ? 'Online' : 'Offline';
+                        el.classList.remove('bg-secondary','bg-success','bg-danger');
+                        el.classList.add(ok ? 'bg-success' : 'bg-danger');
+                    } catch(_) {
+                        el.textContent = 'Offline';
+                        el.classList.remove('bg-secondary','bg-success','bg-danger');
+                        el.classList.add('bg-danger');
+                    }
+                }
+                updateOnlineIndicator();
+                updateRemoteDbIndicator();
+                window.addEventListener('online', updateOnlineIndicator);
+                window.addEventListener('offline', updateOnlineIndicator);
+                setInterval(updateRemoteDbIndicator, 60000);
+            })();
+            
+            // Initialize variables
+            let companies = [];
+            let filteredCompanies = [];
+            let currentCompanyId = null;
+            let deleteCompanyId = null;
+            
+            // Initialize page
+            init();
+            
+            // Function to initialize the page
+            function init() {
+                // Setup event listeners
+                setupEventListeners();
+                
+                // Load companies
+                loadCompanies();
+                
+                // Check for URL parameters
+                checkUrlParams();
+            }
+            
+            // Function to setup event listeners
+            function setupEventListeners() {
+                // Mobile menu toggle
+                document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+                    document.getElementById('sidebar').classList.toggle('active');
+                });
+                
+                // Logout button
+                document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = 'index.html';
+                });
+                
+                // Refresh button
+                document.getElementById('refreshBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    loadCompanies();
+                });
+                
+                // Add company button
+                document.getElementById('addCompanyBtn').addEventListener('click', function() {
+                    openCompanyModal();
+                });
+                
+                // Save company button
+                document.getElementById('saveCompanyBtn').addEventListener('click', function() {
+                    saveCompany();
+                });
+                
+                // Confirm delete button
+                document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                    deleteCompany(deleteCompanyId);
+                });
+                
+                // Search input
+                document.getElementById('searchInput').addEventListener('input', function() {
+                    filterCompanies();
+                });
+                
+                // Filter select
+                document.getElementById('filterSelect').addEventListener('change', function() {
+                    filterCompanies();
+                });
+                
+                // Clear filter button
+                document.getElementById('clearFilterBtn').addEventListener('click', function() {
+                    document.getElementById('searchInput').value = '';
+                    document.getElementById('filterSelect').value = '';
+                    filterCompanies();
+                });
+                
+                // Company logo input
+                document.getElementById('companyLogo').addEventListener('change', function(e) {
+                    handleImageUpload(e, 'logoPreview');
+                });
+                
+                // Company signature input
+                document.getElementById('companySignature').addEventListener('change', function(e) {
+                    handleImageUpload(e, 'signaturePreview');
+                });
+                
+                // UPI QR code input
+                document.getElementById('upiQrCode').addEventListener('change', function(e) {
+                    handleImageUpload(e, 'upiQrPreview');
+                });
+                
+                // Copy buttons for UPI
+                document.querySelectorAll('.copy-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const targetId = this.getAttribute('data-copy');
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement && targetElement.value) {
+                            navigator.clipboard.writeText(targetElement.value).then(function() {
+                                // Show copied state
+                                btn.classList.add('copied');
+                                btn.innerHTML = '<i class="bi bi-check-circle"></i>';
+                                
+                                // Reset after 2 seconds
+                                setTimeout(function() {
+                                    btn.classList.remove('copied');
+                                    btn.innerHTML = '<i class="bi bi-clipboard"></i>';
+                                }, 2000);
+                            });
+                        }
+                    });
+                });
+            }
+            
+            // Function to check URL parameters
+            function checkUrlParams() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const action = urlParams.get('action');
+                
+                if (action === 'create') {
+                    // Open the company modal after a short delay to ensure the page is loaded
+                    setTimeout(function() {
+                        openCompanyModal();
+                    }, 500);
+                }
+            }
+            
+            // Function to load companies
+            function loadCompanies() {
+                // Show loading overlay
+                document.getElementById('loadingOverlay').classList.add('active');
+                
+                // Load companies from local storage
+                localforage.getItem('companies')
+                    .then(function(data) {
+                        companies = data || [];
+                        filteredCompanies = [...companies];
+                        
+                        // Render companies table
+                        renderCompaniesTable();
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                    })
+                    .catch(function(err) {
+                        console.error('Error loading companies:', err);
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        
+                        // Show error message
+                        showNotification('Error loading companies', 'danger');
+                    });
+            }
+            
+            // Function to render companies table
+            function renderCompaniesTable() {
+                const container = document.getElementById('companiesTableContainer');
+                
+                if (filteredCompanies.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-building"></i>
+                            </div>
+                            <h3 class="empty-state-title">No companies found</h3>
+                            <p class="empty-state-text">Add your first company to get started</p>
+                            <button class="btn btn-primary" id="emptyStateAddBtn">
+                                <i class="bi bi-plus-circle me-2"></i>Add Company
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Add event listener to the empty state button
+                    document.getElementById('emptyStateAddBtn').addEventListener('click', function() {
+                        openCompanyModal();
+                    });
+                } else {
+                    let tableHTML = `
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Logo</th>
+                                        <th>Company Name</th>
+                                        <th>Contact</th>
+                                        <th>GSTIN</th>
+                                        <th>Bank Details</th>
+                                        <th>UPI</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+                    
+                    filteredCompanies.forEach(function(company) {
+                        const logoHtml = company.logo 
+                            ? `<img src="${company.logo}" alt="${company.name}" class="company-logo-small">` 
+                            : '<div class="company-logo-small d-flex align-items-center justify-content-center"><i class="bi bi-building text-muted"></i></div>';
+                        
+                        const statusBadge = company.status === 'active' 
+                            ? '<span class="badge bg-success">Active</span>' 
+                            : '<span class="badge bg-secondary">Inactive</span>';
+                        
+                        const bankInfo = company.bankName 
+                            ? `<div class="small">${company.bankName}</div><div class="small text-muted">****${company.accountNumber ? company.accountNumber.slice(-4) : ''}</div>` 
+                            : '-';
+                        
+                        const upiInfo = company.upiId 
+                            ? `<div class="small">${company.upiId}</div>` 
+                            : '-';
+                        
+                        tableHTML += `
+                            <tr>
+                                <td>${logoHtml}</td>
+                                <td>
+                                    <div class="company-name">${company.name}</div>
+                                    <div class="company-address" title="${company.address || ''}">${company.address || '-'}</div>
+                                </td>
+                                <td>
+                                    <div>${company.email || '-'}</div>
+                                    <div>${company.phone || '-'}</div>
+                                </td>
+                                <td>${company.gstin || '-'}</td>
+                                <td>${bankInfo}</td>
+                                <td>${upiInfo}</td>
+                                <td>${statusBadge}</td>
+                                <td>
+                                    <div class="company-actions">
+                                        <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${company.id}" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${company.id}" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    
+                    tableHTML += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    
+                    container.innerHTML = tableHTML;
+                    
+                    // Add event listeners to edit and delete buttons
+                    document.querySelectorAll('.edit-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const companyId = this.getAttribute('data-id');
+                            openCompanyModal(companyId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.delete-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const companyId = this.getAttribute('data-id');
+                            openDeleteModal(companyId);
+                        });
+                    });
+                }
+            }
+            
+            // Function to filter companies
+            function filterCompanies() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const statusFilter = document.getElementById('filterSelect').value;
+                
+                filteredCompanies = companies.filter(function(company) {
+                    const matchesSearch = !searchTerm || 
+                        company.name.toLowerCase().includes(searchTerm) ||
+                        (company.gstin && company.gstin.toLowerCase().includes(searchTerm)) ||
+                        (company.pan && company.pan.toLowerCase().includes(searchTerm)) ||
+                        (company.email && company.email.toLowerCase().includes(searchTerm)) ||
+                        (company.bankName && company.bankName.toLowerCase().includes(searchTerm)) ||
+                        (company.upiId && company.upiId.toLowerCase().includes(searchTerm)) ||
+                        (company.address && company.address.toLowerCase().includes(searchTerm));
+                    
+                    const matchesStatus = !statusFilter || company.status === statusFilter;
+                    
+                    return matchesSearch && matchesStatus;
+                });
+                
+                renderCompaniesTable();
+            }
+            
+            // Function to open company modal
+            function openCompanyModal(companyId = null) {
+                currentCompanyId = companyId;
+                
+                // Reset form
+                document.getElementById('companyForm').reset();
+                document.getElementById('logoPreview').innerHTML = '<div class="placeholder">No logo</div>';
+                document.getElementById('signaturePreview').innerHTML = '<div class="placeholder">No signature</div>';
+                document.getElementById('upiQrPreview').innerHTML = '<div class="placeholder">No QR code</div>';
+                
+                // Set modal title
+                const modalLabel = document.getElementById('companyModalLabel');
+                if (companyId) {
+                    modalLabel.textContent = 'Edit Company';
+                    
+                    // Find company
+                    const company = companies.find(c => c.id === companyId);
+                    if (company) {
+                        // Populate basic information
+                        document.getElementById('companyName').value = company.name || '';
+                        document.getElementById('companyEmail').value = company.email || '';
+                        document.getElementById('companyPhone').value = company.phone || '';
+                        document.getElementById('companyWebsite').value = company.website || '';
+                        document.getElementById('companyAddress').value = company.address || '';
+                        document.getElementById('companyGSTIN').value = company.gstin || '';
+                        document.getElementById('companyPAN').value = company.pan || '';
+                        document.getElementById('companyNotes').value = company.notes || '';
+                        document.getElementById('companyStatus').value = company.status || 'active';
+                        
+                        // Populate bank details
+                        document.getElementById('bankName').value = company.bankName || '';
+                        document.getElementById('accountName').value = company.accountName || '';
+                        document.getElementById('accountNumber').value = company.accountNumber || '';
+                        document.getElementById('ifscCode').value = company.ifscCode || '';
+                        document.getElementById('branchName').value = company.branchName || '';
+                        document.getElementById('accountType').value = company.accountType || '';
+                        
+                        // Populate UPI details
+                        document.getElementById('upiId').value = company.upiId || '';
+                        
+                        // Show images if available
+                        if (company.logo) {
+                            document.getElementById('logoPreview').innerHTML = `<img src="${company.logo}" alt="Company Logo">`;
+                        }
+                        
+                        if (company.signature) {
+                            document.getElementById('signaturePreview').innerHTML = `<img src="${company.signature}" alt="Signature">`;
+                        }
+                        
+                        if (company.upiQrCode) {
+                            document.getElementById('upiQrPreview').innerHTML = `<img src="${company.upiQrCode}" alt="UPI QR Code">`;
+                        }
+                    }
+                } else {
+                    modalLabel.textContent = 'Add Company';
+                }
+                
+                // Show modal
+                const companyModal = new bootstrap.Modal(document.getElementById('companyModal'));
+                companyModal.show();
+            }
+            
+            // Function to save company
+            function saveCompany() {
+                // Validate form
+                const form = document.getElementById('companyForm');
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+                
+                // Get form data
+                const companyData = {
+                    // Basic Information
+                    name: document.getElementById('companyName').value,
+                    email: document.getElementById('companyEmail').value,
+                    phone: document.getElementById('companyPhone').value,
+                    website: document.getElementById('companyWebsite').value,
+                    address: document.getElementById('companyAddress').value,
+                    gstin: document.getElementById('companyGSTIN').value,
+                    pan: document.getElementById('companyPAN').value,
+                    notes: document.getElementById('companyNotes').value,
+                    status: document.getElementById('companyStatus').value,
+                    logo: document.querySelector('#logoPreview img')?.src || null,
+                    signature: document.querySelector('#signaturePreview img')?.src || null,
+                    
+                    // Bank Details
+                    bankName: document.getElementById('bankName').value,
+                    accountName: document.getElementById('accountName').value,
+                    accountNumber: document.getElementById('accountNumber').value,
+                    ifscCode: document.getElementById('ifscCode').value,
+                    branchName: document.getElementById('branchName').value,
+                    accountType: document.getElementById('accountType').value,
+                    
+                    // UPI Details
+                    upiId: document.getElementById('upiId').value,
+                    upiQrCode: document.querySelector('#upiQrPreview img')?.src || null
+                };
+                
+                // Show loading overlay
+                document.getElementById('loadingOverlay').classList.add('active');
+                
+                if (currentCompanyId) {
+                    // Update existing company
+                    const index = companies.findIndex(c => c.id === currentCompanyId);
+                    if (index !== -1) {
+                        companies[index] = { ...companies[index], ...companyData };
+                    }
+                } else {
+                    // Add new company
+                    const newCompany = {
+                        id: generateId(),
+                        ...companyData,
+                        createdAt: new Date().toISOString()
+                    };
+                    companies.push(newCompany);
+                }
+                
+                // Save to local storage
+                localforage.setItem('companies', companies)
+                    .then(function() {
+                        // Update filtered companies
+                        filteredCompanies = [...companies];
+                        
+                        // Render companies table
+                        renderCompaniesTable();
+                        
+                        // Hide modal
+                        const companyModal = bootstrap.Modal.getInstance(document.getElementById('companyModal'));
+                        companyModal.hide();
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        
+                        // Show success message
+                        showNotification('Company saved successfully', 'success');
+                    })
+                    .catch(function(err) {
+                        console.error('Error saving company:', err);
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        
+                        // Show error message
+                        showNotification('Error saving company', 'danger');
+                    });
+            }
+            
+            // Function to open delete modal
+            function openDeleteModal(companyId) {
+                deleteCompanyId = companyId;
+                
+                // Show modal
+                const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                deleteModal.show();
+            }
+            
+            // Function to delete company
+            function deleteCompany(companyId) {
+                // Show loading overlay
+                document.getElementById('loadingOverlay').classList.add('active');
+                
+                // Remove company from array
+                companies = companies.filter(c => c.id !== companyId);
+                
+                // Save to local storage
+                localforage.setItem('companies', companies)
+                    .then(function() {
+                        // Update filtered companies
+                        filteredCompanies = [...companies];
+                        
+                        // Render companies table
+                        renderCompaniesTable();
+                        
+                        // Hide modal
+                        const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                        deleteModal.hide();
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        
+                        // Show success message
+                        showNotification('Company deleted successfully', 'success');
+                    })
+                    .catch(function(err) {
+                        console.error('Error deleting company:', err);
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        
+                        // Show error message
+                        showNotification('Error deleting company', 'danger');
+                    });
+            }
+            
+            // Function to handle image upload
+            function handleImageUpload(event, previewId) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                // Check file type
+                if (!file.type.startsWith('image/')) {
+                    showNotification('Please select an image file', 'warning');
+                    return;
+                }
+                
+                // Check file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification('Image size should be less than 5MB', 'warning');
+                    return;
+                }
+                
+                // Read file as base64
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Create image element to resize
+                    const img = new Image();
+                    img.onload = function() {
+                        // Create canvas
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        
+                        // Calculate new dimensions (max width 300px)
+                        let width = img.width;
+                        let height = img.height;
+                        const maxWidth = 300;
+                        
+                        if (width > maxWidth) {
+                            height = (maxWidth / width) * height;
+                            width = maxWidth;
+                        }
+                        
+                        // Set canvas dimensions
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        // Draw image
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Get base64 string
+                        const base64 = canvas.toDataURL('image/jpeg', 0.8);
+                        
+                        // Update preview
+                        document.getElementById(previewId).innerHTML = `<img src="${base64}" alt="Preview">`;
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // Function to generate ID
+            function generateId() {
+                return 'company_' + Date.now().toString(36) + Math.random().toString(36).substr(2);
+            }
+            
+            // Function to show notification
+            function showNotification(message, type) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                notification.style.top = '20px';
+                notification.style.right = '20px';
+                notification.style.zIndex = '9999';
+                notification.style.minWidth = '300px';
+                notification.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                
+                // Add to document
+                document.body.appendChild(notification);
+                
+                // Auto dismiss after 5 seconds
+                setTimeout(function() {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>

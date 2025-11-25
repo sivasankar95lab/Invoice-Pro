@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Pro - Login</title>
+    <!-- Fallback for external onload calls expecting solveSimpleChallenge -->
+    <script>
+        // Provide a safe no-op if some environment calls solveSimpleChallenge onload
+        if (typeof window.solveSimpleChallenge === 'undefined') {
+            window.solveSimpleChallenge = function() { return true; };
+        }
+    </script>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="asset/favicon239x250.png">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --secondary-color: #f5f7ff;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --text-color: #334155;
+            --border-color: #e2e8f0;
+        }
+        
+        body {
+            background-color: var(--secondary-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        
+        .app-logo {
+            max-width: 280px;
+            height: auto;
+        }
+        
+        .company-logo {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            max-width: 120px;
+            height: auto;
+            opacity: 0.7;
+        }
+        
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+            outline: none;
+        }
+        
+        .input-group-text {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+        
+        .input-group .form-control {
+            border-left: none;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .btn-login {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-weight: 500;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-login:hover {
+            background-color: #3a5bd9;
+        }
+        
+        .alert {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            border: none;
+            font-size: 0.9rem;
+        }
+        
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+        
+        .alert-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+        }
+        
+        .loading-spinner {
+            display: none;
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 0.5rem;
+        }
+        
+        /* Loading overlay styles */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-spinner-large {
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.3rem;
+        }
+        
+        .loading-text {
+            margin-top: 1rem;
+            color: var(--text-color);
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-container">
+            <img src="asset/applogo345x150.png" alt="Invoice Pro" class="app-logo">
+        </div>
+        
+        <div id="message-container"></div>
+        
+        <form id="loginForm">
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text" id="togglePassword">
+                        <i class="bi bi-eye" id="eyeIcon"></i>
+                    </span>
+                    <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-login">
+                <span class="spinner-border spinner-border-sm loading-spinner" id="loginSpinner" role="status" aria-hidden="true"></span>
+                Sign In
+            </button>
+        </form>
+    </div>
+    
+    <!-- Company logo positioned at bottom right -->
+    <img src="asset/slablogo.png" alt="Company Logo" class="company-logo">
+    
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border text-primary loading-spinner-large" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="loading-text">Signing in...</div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- LocalForage -->
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            (function(){
+                const SUPABASE_URL = 'https://nnazbmwzqvzzuyecvlik.supabase.co';
+                const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uYXpibXd6cXZ6enV5ZWN2bGlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MzAwNzksImV4cCI6MjA3OTIwNjA3OX0.ENU4UT-QnWL2G1D3Lvpq-YLDgnorqJaeEgChirwaV28';
+                const remoteTables = ['companies','customers','invoices','quotations'];
+                const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+                async function verifyRemoteSetup(){
+                    if (!sb) return;
+                    if (localStorage.getItem('supabase_setup_shown')==='1') return;
+                    try {
+                        const { data, error } = await sb.from('app_store').select('key').limit(1);
+                        if (error) {
+                            showSupabaseSetupModal(error.message || 'Remote not accessible');
+                            localStorage.setItem('supabase_setup_shown','1');
+                        }
+                    } catch (err) {
+                        showSupabaseSetupModal(err && err.message ? err.message : 'Remote not accessible');
+                        localStorage.setItem('supabase_setup_shown','1');
+                    }
+                }
+                function showSupabaseSetupModal(reason){
+                    if (!document.getElementById('supabaseSetupModal')){
+                        const div = document.createElement('div');
+                        div.innerHTML = (
+                            '<div class="modal fade" id="supabaseSetupModal" tabindex="-1" aria-hidden="true">'
+                            + '<div class="modal-dialog modal-lg modal-dialog-scrollable">'
+                            + '<div class="modal-content">'
+                            + '<div class="modal-header">'
+                            + '<h5 class="modal-title">Supabase Setup Required</h5>'
+                            + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'
+                            + '</div>'
+                            + '<div class="modal-body">'
+                            + '<p>Remote database is not ready. Reason: ' + String(reason) + '</p>'
+                            + '<p>Steps to configure your Supabase project:</p>'
+                            + '<ol>'
+                            + '<li>Open SQL editor in Supabase.</li>'
+                            + '<li>Create the table in the public schema:</li>'
+                            + '</ol>'
+                            + '<pre><code>create table if not exists public.app_store (\n  key text primary key,\n  value jsonb not null\n);\nalter table public.app_store enable row level security;\ncreate policy "Allow read to anon" on public.app_store for select using (true);\ncreate policy "Allow insert to anon" on public.app_store for insert with check (true);\ncreate policy "Allow update to anon" on public.app_store for update using (true) with check (true);\ncreate policy "Allow delete to anon" on public.app_store for delete using (true);\n</code></pre>'
+                            + '<p>Ensure the anon public key is enabled for your project and the policies allow reads and writes.</p>'
+                            + '</div>'
+                            + '<div class="modal-footer">'
+                            + '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                        );
+                        document.body.appendChild(div);
+                    }
+                    const modalEl = document.getElementById('supabaseSetupModal');
+                    if (window.bootstrap && window.bootstrap.Modal) {
+                        const modal = new window.bootstrap.Modal(modalEl);
+                        modal.show();
+                    } else {
+                        modalEl.style.display = 'block';
+                    }
+                }
+                async function remoteGet(key){
+                    try { if (!sb || remoteTables.indexOf(key)===-1) return null; const { data, error } = await sb.from('app_store').select('value').eq('key', key); if (error) return null; return Array.isArray(data)&&data.length?data[0].value:null; } catch(_) { return null; }
+                }
+                async function remoteUpsert(key, value){ try { if (!sb || remoteTables.indexOf(key)===-1) return; await sb.from('app_store').upsert({ key, value }, { onConflict: 'key' }); } catch(_) {} }
+                const originalGetItem = localforage.getItem.bind(localforage);
+                const originalSetItem = localforage.setItem.bind(localforage);
+                localforage.getItem = async function(key){ const remote = await remoteGet(key); if (remote!==null && remote!==undefined){ await originalSetItem(key, remote); return remote; } return originalGetItem(key); };
+                localforage.setItem = async function(key,value){ await remoteUpsert(key,value); return originalSetItem(key,value); };
+                verifyRemoteSetup();
+            })();
+            // Initialize localForage
+            localforage.config({
+                name: 'InvoiceProDB',
+                storeName: 'auth'
+            });
+            
+            // Toggle password visibility
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Toggle eye icon
+                if (type === 'password') {
+                    eyeIcon.classList.remove('bi-eye-slash');
+                    eyeIcon.classList.add('bi-eye');
+                } else {
+                    eyeIcon.classList.remove('bi-eye');
+                    eyeIcon.classList.add('bi-eye-slash');
+                }
+            });
+            
+            // Handle form submission
+            const loginForm = document.getElementById('loginForm');
+            const messageContainer = document.getElementById('message-container');
+            const loginSpinner = document.getElementById('loginSpinner');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const password = passwordInput.value;
+                
+                // Show loading spinner
+                loginSpinner.style.display = 'inline-block';
+                
+                // Simulate network delay
+                setTimeout(function() {
+                    // Hide loading spinner
+                    loginSpinner.style.display = 'none';
+                    
+                    // Validate password
+                    if (password === 'adminpass') {
+                        // Store authentication status
+                        localforage.setItem('authenticated', true)
+                            .then(function() {
+                                // Show loading overlay
+                                loadingOverlay.classList.add('active');
+                                
+                                // Redirect to dashboard after delay
+                                setTimeout(function() {
+                                    window.location.href = 'dashboard.html';
+                                }, 2000);
+                            })
+                            .catch(function(err) {
+                                showMessage('Error saving authentication status: ' + err, 'danger');
+                            });
+                    } else {
+                        // Show error message
+                        showMessage('Invalid password. Please try again.', 'danger');
+                        
+                        // Clear password field
+                        passwordInput.value = '';
+                        passwordInput.focus();
+                    }
+                }, 1000);
+            });
+            
+            // Function to show messages
+            function showMessage(message, type) {
+                messageContainer.innerHTML = `
+                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                
+                // Auto dismiss after 5 seconds
+                setTimeout(function() {
+                    const alertElement = messageContainer.querySelector('.alert');
+                    if (alertElement) {
+                        const bsAlert = new bootstrap.Alert(alertElement);
+                        bsAlert.close();
+                    }
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,3027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Pro - Invoice Management</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="asset/favicon239x250.png">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --secondary-color: #f5f7ff;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --text-color: #334155;
+            --border-color: #e2e8f0;
+            --sidebar-width: 280px;
+        }
+        
+        body {
+            background-color: var(--secondary-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background-color: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .sidebar-logo {
+            max-width: 200px;
+            height: auto;
+        }
+        
+        .sidebar-nav {
+            padding: 1.5rem 0;
+        }
+        
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+        }
+        
+        .nav-link.active {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .nav-link i {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 0;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            color: #64748b;
+        }
+        
+        /* Table Styles */
+        .table-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th {
+            background-color: var(--secondary-color);
+            font-weight: 600;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--border-color);
+            padding: 0.75rem;
+            text-align: left;
+        }
+        
+        .table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(74, 108, 247, 0.05);
+        }
+        
+        /* Search and Filter Styles */
+        .search-filter-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-control, .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+            outline: none;
+        }
+        
+        /* Button Styles */
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a5bd9;
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Company Logo */
+        .company-logo {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            max-width: 120px;
+            height: auto;
+            opacity: 0.7;
+            z-index: 100;
+        }
+        
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background-color: white;
+            border-radius: 8px;
+            padding: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Modal Styles */
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+        
+        .modal-title {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+        
+        /* Form Section Styles */
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .form-section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-section-title i {
+            font-size: 1.25rem;
+        }
+        
+        /* Badge Styles */
+        .badge {
+            padding: 0.375rem 0.75rem;
+            font-weight: 500;
+        }
+        
+        /* Item Table Styles */
+        .item-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .item-table th, .item-table td {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .item-table th {
+            background-color: var(--secondary-color);
+            font-weight: 600;
+        }
+        
+        .item-input {
+            width: 100%;
+            border: none;
+            padding: 0.25rem;
+            background-color: transparent;
+        }
+        
+        .item-input:focus {
+            outline: none;
+            background-color: rgba(74, 108, 247, 0.05);
+        }
+        
+        /* Invoice Preview Styles */
+        .invoice-preview {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .invoice-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .invoice-details {
+            margin-bottom: 1rem;
+        }
+        
+        .invoice-details-row {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+        
+        .invoice-details-label {
+            font-weight: 600;
+            width: 120px;
+        }
+        
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        
+        .invoice-table th, .invoice-table td {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            text-align: left;
+        }
+        
+        .invoice-table th {
+            background-color: var(--secondary-color);
+        }
+        
+        .invoice-summary {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+        
+        .invoice-summary-table {
+            width: 300px;
+            border-collapse: collapse;
+        }
+        
+        .invoice-summary-table td {
+            padding: 0.25rem 0.5rem;
+            text-align: right;
+        }
+        
+        .invoice-summary-table td:first-child {
+            text-align: left;
+        }
+        
+        /* Preview Modal Styles */
+        .preview-modal .modal-dialog {
+            max-width: 900px;
+        }
+        
+        .preview-content {
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+        }
+        
+        /* Export Options Styles */
+        .export-options {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .export-option {
+            flex: 1;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .export-option:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(74, 108, 247, 0.05);
+        }
+        
+        .export-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(74, 108, 247, 0.1);
+        }
+        
+        .export-option i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+        
+        /* Loading overlay styles */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-spinner-large {
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.3rem;
+        }
+        
+        .loading-text {
+            margin-top: 1rem;
+            color: var(--text-color);
+            font-size: 1.1rem;
+        }
+        
+        /* Empty State Styles */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+        
+        .empty-state-text {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* QR Code Styles */
+        .qr-code-container {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+        
+        .qr-code {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="bi bi-list fs-4"></i>
+    </button>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="asset/applogo345x150.png" alt="Invoice Pro" class="sidebar-logo">
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="company.html" class="nav-link">
+                    <i class="bi bi-building"></i>
+                    <span>Company</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="customer.html" class="nav-link">
+                    <i class="bi bi-people"></i>
+                    <span>Customers</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="quotation.html" class="nav-link">
+                    <i class="bi bi-file-text"></i>
+                    <span>Quotations</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="invoice.html" class="nav-link active">
+                    <i class="bi bi-receipt"></i>
+                    <span>Invoices</span>
+                </a>
+            </div>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="nav-item">
+                <div class="nav-link d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-wifi"></i> Online Status</span>
+                    <span id="onlineIndicator" class="badge rounded-pill bg-secondary">Checking...</span>
+                </div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-link d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-cloud"></i> Remote DB</span>
+                    <span id="remoteDbIndicator" class="badge rounded-pill bg-secondary">Checking...</span>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link" id="refreshBtn">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>Refresh</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="index.html" class="nav-link" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Invoice Management</h1>
+                <p class="page-subtitle">Create and manage your invoices</p>
+            </div>
+            <div>
+                <button class="btn btn-outline-primary me-2" id="exportBtn">
+                    <i class="bi bi-download me-2"></i>Export
+                </button>
+                <button class="btn btn-primary" id="addInvoiceBtn">
+                    <i class="bi bi-plus-circle me-2"></i>Create Invoice
+                </button>
+            </div>
+        </div>
+        
+        <!-- Search and Filter -->
+        <div class="search-filter-container">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search by number, customer, status...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="draft">Draft</option>
+                        <option value="sent">Sent</option>
+                        <option value="paid">Paid</option>
+                        <option value="overdue">Overdue</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="dateFilter">
+                        <option value="">All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-outline-primary w-100" id="clearFilterBtn">
+                        <i class="bi bi-x-circle me-2"></i>Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Invoices Table -->
+        <div class="table-container">
+            <div id="invoicesTableContainer">
+                <!-- Table will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Company Logo -->
+    <img src="asset/slablogo.png" alt="Company Logo" class="company-logo">
+    
+    <!-- Invoice Modal -->
+    <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="invoiceModalLabel">Create Invoice</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="invoiceForm">
+                        <input type="hidden" id="invoiceId">
+                        
+                        <!-- Invoice Details Section -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">
+                                <i class="bi bi-receipt"></i>
+                                Invoice Details
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="invoiceNumber" class="form-label">Invoice Number</label>
+                                    <input type="text" class="form-control" id="invoiceNumber" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="invoiceDate" class="form-label">Date</label>
+                                    <input type="date" class="form-control" id="invoiceDate" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="dueDate" class="form-label">Due Date</label>
+                                    <input type="date" class="form-control" id="dueDate" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="invoiceStatus" class="form-label">Status</label>
+                                    <select class="form-select" id="invoiceStatus">
+                                        <option value="draft">Draft</option>
+                                        <option value="sent">Sent</option>
+                                        <option value="paid">Paid</option>
+                                        <option value="overdue">Overdue</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Company and Customer Section -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">
+                                <i class="bi bi-building"></i>
+                                Company and Customer
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="companySelect" class="form-label">Company</label>
+                                    <select class="form-select" id="companySelect" required>
+                                        <option value="">Select Company</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="customerSelect" class="form-label">Customer</label>
+                                    <select class="form-select" id="customerSelect" required>
+                                        <option value="">Select Customer</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="transportMode" class="form-label">Mode of Transport</label>
+                                    <select class="form-select" id="transportMode">
+                                        <option value="road">Road</option>
+                                        <option value="rail">Rail</option>
+                                        <option value="air">Air</option>
+                                        <option value="sea">Sea</option>
+                                        <option value="courier">Courier</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="vehicleRefNumber" class="form-label">Vehicle/Reference Number</label>
+                                    <input type="text" class="form-control" id="vehicleRefNumber" placeholder="Enter vehicle/reference number">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Items Section -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">
+                                <i class="bi bi-list"></i>
+                                Items
+                            </h6>
+                            <div class="table-responsive">
+                                <table class="item-table" id="itemsTable">
+                                    <thead>
+                                        <tr>
+                                            <th width="5%">#</th>
+                                            <th width="30%">Description</th>
+                                            <th width="10%">HSN/SAC</th>
+                                            <th width="10%">Qty</th>
+                                            <th width="10%">Unit Price (₹)</th>
+                                            <th width="10%">GST (%)</th>
+                                            <th width="10%">Amount (₹)</th>
+                                            <th width="5%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="itemsTableBody">
+                                        <!-- Items will be added dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary mt-2" id="addItemBtn">
+                                <i class="bi bi-plus-circle me-2"></i>Add Item
+                            </button>
+                        </div>
+                        
+                        <!-- Discount Section -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">
+                                <i class="bi bi-percent"></i>
+                                Discount
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="discountType" class="form-label">Discount Type</label>
+                                    <select class="form-select" id="discountType">
+                                        <option value="">No Discount</option>
+                                        <option value="percentage">Percentage</option>
+                                        <option value="fixed">Fixed Amount</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="discountValue" class="form-label">Discount Value (₹)</label>
+                                    <input type="number" class="form-control" id="discountValue" min="0" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Terms and Conditions Section -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">
+                                <i class="bi bi-file-text"></i>
+                                Terms and Conditions
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="termsConditions" class="form-label">Terms and Conditions</label>
+                                    <textarea class="form-control" id="termsConditions" rows="4"></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <label for="notes" class="form-label">Notes</label>
+                                    <textarea class="form-control" id="notes" rows="2"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Summary Section -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">
+                                <i class="bi bi-calculator"></i>
+                                Summary
+                            </h6>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="invoice-preview" id="invoicePreview">
+                                        <!-- Invoice preview will be generated here -->
+                                    </div>
+                                </div>
+                                <div class="col-md-6 d-none">
+                                    <div class="table-responsive">
+                                        <table>
+                                            <tr>
+                                                <td>Subtotal:</td>
+                                                <td id="subtotalDisplay">₹0.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td>CGST:</td>
+                                                <td id="cgstDisplay">₹0.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td>SGST:</td>
+                                                <td id="sgstDisplay">₹0.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Total GST:</td>
+                                                <td id="totalGstDisplay">₹0.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Discount:</td>
+                                                <td id="discountDisplay">₹0.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Total:</strong></td>
+                                                <td id="totalDisplay"><strong>₹0.00</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Amount in Words:</td>
+                                                <td id="amountInWords">Zero</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    
+                    <button type="button" class="btn btn-primary" id="saveInvoiceBtn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Preview Modal -->
+    <div class="modal fade preview-modal" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewModalLabel">Invoice Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="preview-content" id="previewContent">
+                        <!-- Preview content will be generated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this invoice? This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border text-primary loading-spinner-large" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="loading-text">Loading...</div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- LocalForage -->
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- jsPDF AutoTable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <!-- Number to Words -->
+    <script src="https://cdn.jsdelivr.net/npm/number-to-words@1.2.1/numberToWords.min.js"></script>
+    <!-- QR Code -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize localForage
+            localforage.config({
+                name: 'InvoiceProDB',
+                storeName: 'data'
+            });
+            (function(){
+                const SUPABASE_URL = 'https://nnazbmwzqvzzuyecvlik.supabase.co';
+                const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uYXpibXd6cXZ6enV5ZWN2bGlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MzAwNzksImV4cCI6MjA3OTIwNjA3OX0.ENU4UT-QnWL2G1D3Lvpq-YLDgnorqJaeEgChirwaV28';
+                const remoteTables = ['companies','customers','invoices','quotations'];
+                const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+                async function verifyRemoteSetup(){
+                    if (!sb) return;
+                    if (localStorage.getItem('supabase_setup_shown')==='1') return;
+                    try {
+                        const { data, error } = await sb.from('app_store').select('key').limit(1);
+                        if (error) {
+                            showSupabaseSetupModal(error.message || 'Remote not accessible');
+                            localStorage.setItem('supabase_setup_shown','1');
+                        }
+                    } catch (err) {
+                        showSupabaseSetupModal(err && err.message ? err.message : 'Remote not accessible');
+                        localStorage.setItem('supabase_setup_shown','1');
+                    }
+                }
+                function showSupabaseSetupModal(reason){
+                    if (!document.getElementById('supabaseSetupModal')){
+                        const div = document.createElement('div');
+                        div.innerHTML = (
+                            '<div class="modal fade" id="supabaseSetupModal" tabindex="-1" aria-hidden="true">'
+                            + '<div class="modal-dialog modal-lg modal-dialog-scrollable">'
+                            + '<div class="modal-content">'
+                            + '<div class="modal-header">'
+                            + '<h5 class="modal-title">Supabase Setup Required</h5>'
+                            + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'
+                            + '</div>'
+                            + '<div class="modal-body">'
+                            + '<p>Remote database is not ready. Reason: ' + String(reason) + '</p>'
+                            + '<p>Steps to configure your Supabase project:</p>'
+                            + '<ol>'
+                            + '<li>Open SQL editor in Supabase.</li>'
+                            + '<li>Create the table in the public schema:</li>'
+                            + '</ol>'
+                            + '<pre><code>create table if not exists public.app_store (\n  key text primary key,\n  value jsonb not null\n);\nalter table public.app_store enable row level security;\ncreate policy "Allow read to anon" on public.app_store for select using (true);\ncreate policy "Allow insert to anon" on public.app_store for insert with check (true);\ncreate policy "Allow update to anon" on public.app_store for update using (true) with check (true);\ncreate policy "Allow delete to anon" on public.app_store for delete using (true);\n</code></pre>'
+                            + '<p>Ensure the anon public key is enabled for your project and the policies allow reads and writes.</p>'
+                            + '</div>'
+                            + '<div class="modal-footer">'
+                            + '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                        );
+                        document.body.appendChild(div);
+                    }
+                    const modalEl = document.getElementById('supabaseSetupModal');
+                    if (window.bootstrap && window.bootstrap.Modal) {
+                        const modal = new window.bootstrap.Modal(modalEl);
+                        modal.show();
+                    } else {
+                        modalEl.style.display = 'block';
+                    }
+                }
+                async function remoteGet(key){ try { if (!sb || remoteTables.indexOf(key)===-1) return null; const { data, error } = await sb.from('app_store').select('value').eq('key', key); if (error) return null; return Array.isArray(data)&&data.length?data[0].value:null; } catch(_) { return null; } }
+                async function remoteUpsert(key,value){ try { if (!sb || remoteTables.indexOf(key)===-1) return; await sb.from('app_store').upsert({ key, value }, { onConflict: 'key' }); } catch(_) {} }
+                const originalGetItem = localforage.getItem.bind(localforage);
+                const originalSetItem = localforage.setItem.bind(localforage);
+                localforage.getItem = async function(key){ const remote = await remoteGet(key); if (remote!==null && remote!==undefined){ await originalSetItem(key, remote); return remote; } return originalGetItem(key); };
+                localforage.setItem = async function(key,value){ await remoteUpsert(key,value); return originalSetItem(key,value); };
+                verifyRemoteSetup();
+                function updateOnlineIndicator(){
+                    const el = document.getElementById('onlineIndicator');
+                    if (!el) return;
+                    const online = navigator.onLine;
+                    el.textContent = online ? 'Online' : 'Offline';
+                    el.classList.remove('bg-secondary','bg-success','bg-danger');
+                    el.classList.add(online ? 'bg-success' : 'bg-danger');
+                }
+                async function updateRemoteDbIndicator(){
+                    const el = document.getElementById('remoteDbIndicator');
+                    if (!el) return;
+                    try {
+                        if (!sb) { el.textContent = 'Offline'; el.classList.remove('bg-secondary','bg-success','bg-danger'); el.classList.add('bg-danger'); return; }
+                        const { error } = await sb.from('app_store').select('key').limit(1);
+                        const ok = !error;
+                        el.textContent = ok ? 'Online' : 'Offline';
+                        el.classList.remove('bg-secondary','bg-success','bg-danger');
+                        el.classList.add(ok ? 'bg-success' : 'bg-danger');
+                    } catch(_) {
+                        el.textContent = 'Offline';
+                        el.classList.remove('bg-secondary','bg-success','bg-danger');
+                        el.classList.add('bg-danger');
+                    }
+                }
+                updateOnlineIndicator();
+                updateRemoteDbIndicator();
+                window.addEventListener('online', updateOnlineIndicator);
+                window.addEventListener('offline', updateOnlineIndicator);
+                setInterval(updateRemoteDbIndicator, 60000);
+            })();
+            
+            // Initialize variables
+            let invoices = [];
+            let filteredInvoices = [];
+            let currentInvoiceId = null;
+            let deleteInvoiceId = null;
+            let previewInvoiceId = null;
+            let selectedExportType = 'invoice';
+            let companies = [];
+            let customers = [];
+            let items = [];
+            
+            // Initialize page
+            init();
+            
+            // Function to initialize the page
+            function init() {
+                // Setup event listeners
+                setupEventListeners();
+                
+                // Load data
+                loadData();
+                
+                // Check for URL parameters
+                checkUrlParams();
+            }
+            
+            // Function to setup event listeners
+            function setupEventListeners() {
+                // Mobile menu toggle
+                document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+                    document.getElementById('sidebar').classList.toggle('active');
+                });
+                
+                // Logout button
+                document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = 'index.html';
+                });
+                
+                // Refresh button
+                document.getElementById('refreshBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    loadData();
+                });
+                
+                // Add invoice button
+                document.getElementById('addInvoiceBtn').addEventListener('click', function() {
+                    openInvoiceModal();
+                });
+                
+                // Save invoice button
+                document.getElementById('saveInvoiceBtn').addEventListener('click', function() {
+                    saveInvoice();
+                });
+                
+                // Preview button removed (button removed from modal)
+                
+                // Download PDF button in preview modal
+                const downloadBtn = document.getElementById('downloadPdfBtn');
+                if (downloadBtn) {
+                    downloadBtn.addEventListener('click', function() {
+                        generatePDF(previewInvoiceId, selectedExportType);
+                    });
+                }
+                
+                // Confirm delete button
+                document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                    deleteInvoice(deleteInvoiceId);
+                });
+                
+                // Export button
+                document.getElementById('exportBtn').addEventListener('click', function() {
+                    exportInvoices();
+                });
+                
+                // Search input
+                document.getElementById('searchInput').addEventListener('input', function() {
+                    filterInvoices();
+                });
+                
+                // Status filter
+                document.getElementById('statusFilter').addEventListener('change', function() {
+                    filterInvoices();
+                });
+                
+                // Date filter
+                document.getElementById('dateFilter').addEventListener('change', function() {
+                    filterInvoices();
+                });
+                
+                // Clear filter button
+                document.getElementById('clearFilterBtn').addEventListener('click', function() {
+                    document.getElementById('searchInput').value = '';
+                    document.getElementById('statusFilter').value = '';
+                    document.getElementById('dateFilter').value = '';
+                    filterInvoices();
+                });
+                
+                // Add item button
+                document.getElementById('addItemBtn').addEventListener('click', function() {
+                    addItem();
+                });
+                
+                // Discount type change
+                document.getElementById('discountType').addEventListener('change', function() {
+                    updateCalculations();
+                });
+                
+                // Discount value change
+                document.getElementById('discountValue').addEventListener('input', function() {
+                    updateCalculations();
+                });
+                
+                // Export option selection
+                document.querySelectorAll('.export-option').forEach(function(option) {
+                    option.addEventListener('click', function() {
+                        // Remove selected class from all options
+                        document.querySelectorAll('.export-option').forEach(function(opt) {
+                            opt.classList.remove('selected');
+                        });
+                        
+                        // Add selected class to clicked option
+                        this.classList.add('selected');
+                        
+                        // Update selected export type
+                        selectedExportType = this.getAttribute('data-type');
+                        
+                        // Regenerate preview if invoice is selected
+                        if (previewInvoiceId) {
+                            generatePreview(previewInvoiceId, selectedExportType);
+                        }
+                    });
+                });
+                
+                // Set today's date as default
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('invoiceDate').value = today;
+                
+                // Set due date (30 days from today)
+                const dueDate = new Date();
+                dueDate.setDate(dueDate.getDate() + 30);
+                document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
+            }
+            
+            // Function to check URL parameters
+            function checkUrlParams() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const action = urlParams.get('action');
+                
+                if (action === 'create') {
+                    // Open the invoice modal after a short delay to ensure the page is loaded
+                    setTimeout(function() {
+                        openInvoiceModal();
+                    }, 500);
+                }
+            }
+            
+            // Function to load data
+            function loadData() {
+                // Show loading overlay
+                document.getElementById('loadingOverlay').classList.add('active');
+                
+                // Load companies
+                localforage.getItem('companies')
+                    .then(function(data) {
+                        companies = data || [];
+                        
+                        // Populate company select
+                        const companySelect = document.getElementById('companySelect');
+                        companySelect.innerHTML = '<option value="">Select Company</option>';
+                        
+                        companies.forEach(function(company) {
+                            const option = document.createElement('option');
+                            option.value = company.id;
+                            option.textContent = company.name;
+                            companySelect.appendChild(option);
+                        });
+                        
+                        // Load customers
+                        return localforage.getItem('customers');
+                    })
+                    .then(function(data) {
+                        customers = data || [];
+                        
+                        // Populate customer select
+                        const customerSelect = document.getElementById('customerSelect');
+                        customerSelect.innerHTML = '<option value="">Select Customer</option>';
+                        
+                        customers.forEach(function(customer) {
+                            const option = document.createElement('option');
+                            option.value = customer.id;
+                            option.textContent = customer.name;
+                            customerSelect.appendChild(option);
+                        });
+                        
+                        // Load invoices
+                        return localforage.getItem('invoices');
+                    })
+                    .then(function(data) {
+                        invoices = data || [];
+                        filteredInvoices = [...invoices];
+                        
+                        // Render invoices table
+                        renderInvoicesTable();
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                    })
+                    .catch(function(err) {
+                        console.error('Error loading data:', err);
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        
+                        // Show error message
+                        showNotification('Error loading data', 'danger');
+                    });
+            }
+            
+            // Function to render invoices table
+            function renderInvoicesTable() {
+                const container = document.getElementById('invoicesTableContainer');
+                
+                if (filteredInvoices.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-receipt"></i>
+                            </div>
+                            <h3 class="empty-state-title">No invoices found</h3>
+                            <p class="empty-state-text">Create your first invoice to get started</p>
+                            <button class="btn btn-primary" id="emptyStateAddBtn">
+                                <i class="bi bi-plus-circle me-2"></i>Create Invoice
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Add event listener to the empty state button
+                    document.getElementById('emptyStateAddBtn').addEventListener('click', function() {
+                        openInvoiceModal();
+                    });
+                } else {
+                    let tableHTML = `
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Invoice No.</th>
+                                        <th>Date</th>
+                                        <th>Customer</th>
+                                        <th>Amount (₹)</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+                    
+                    filteredInvoices.forEach(function(invoice) {
+                        const customer = customers.find(c => c.id === invoice.customerId);
+                        const customerName = customer ? customer.name : 'Unknown';
+                        
+                        let statusBadge = '';
+                        switch(invoice.status) {
+                            case 'draft':
+                                statusBadge = '<span class="badge bg-secondary">Draft</span>';
+                                break;
+                            case 'sent':
+                                statusBadge = '<span class="badge bg-info">Sent</span>';
+                                break;
+                            case 'paid':
+                                statusBadge = '<span class="badge bg-success">Paid</span>';
+                                break;
+                            case 'overdue':
+                                statusBadge = '<span class="badge bg-warning">Overdue</span>';
+                                break;
+                            case 'cancelled':
+                                statusBadge = '<span class="badge bg-danger">Cancelled</span>';
+                                break;
+                            default:
+                                statusBadge = '<span class="badge bg-secondary">Unknown</span>';
+                        }
+                        
+                        tableHTML += `
+                            <tr>
+                                <td>${invoice.number}</td>
+                                <td>${formatDate(invoice.date)}</td>
+                                <td>${customerName}</td>
+                                <td>₹${parseFloat(invoice.total).toFixed(2)}</td>
+                                <td>${statusBadge}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-primary view-btn" data-id="${invoice.id}" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${invoice.id}" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary pdf-btn" data-id="${invoice.id}" title="Export Tax Invoice">
+                                            <i class="bi bi-file-pdf"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary simple-invoice-btn" data-id="${invoice.id}" title="Export Invoice">
+                                            <i class="bi bi-receipt"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary challan-btn" data-id="${invoice.id}" title="Export Delivery Challan">
+                                            <i class="bi bi-truck"></i>
+                                        </button>
+                                        
+                                        <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${invoice.id}" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    
+                    tableHTML += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    
+                    container.innerHTML = tableHTML;
+                    
+                    // Add event listeners to action buttons
+                    document.querySelectorAll('.view-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const invoiceId = this.getAttribute('data-id');
+                            openPreviewModal(invoiceId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.edit-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const invoiceId = this.getAttribute('data-id');
+                            openInvoiceModal(invoiceId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.pdf-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const invoiceId = this.getAttribute('data-id');
+                            generateTaxInvoicePDF(invoiceId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.challan-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const invoiceId = this.getAttribute('data-id');
+                            generateDeliveryChallanPDF(invoiceId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.simple-invoice-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const invoiceId = this.getAttribute('data-id');
+                            generateInvoicePDF(invoiceId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.delete-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const invoiceId = this.getAttribute('data-id');
+                            openDeleteModal(invoiceId);
+                        });
+                    });
+                }
+            }
+            
+            // Function to filter invoices
+            function filterInvoices() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const statusFilter = document.getElementById('statusFilter').value;
+                const dateFilter = document.getElementById('dateFilter').value;
+                
+                filteredInvoices = invoices.filter(function(invoice) {
+                    const customer = customers.find(c => c.id === invoice.customerId);
+                    const customerName = customer ? customer.name : 'Unknown';
+                    
+                    const matchesSearch = !searchTerm || 
+                        invoice.number.toLowerCase().includes(searchTerm) ||
+                        customerName.toLowerCase().includes(searchTerm);
+                    
+                    const matchesStatus = !statusFilter || invoice.status === statusFilter;
+                    
+                    let matchesDate = true;
+                    if (dateFilter) {
+                        const invoiceDate = new Date(invoice.date);
+                        const today = new Date();
+                        
+                        switch(dateFilter) {
+                            case 'today':
+                                matchesDate = invoiceDate.toDateString() === today.toDateString();
+                                break;
+                            case 'week':
+                                const weekAgo = new Date(today);
+                                weekAgo.setDate(weekAgo.getDate() - 7);
+                                matchesDate = invoiceDate >= weekAgo;
+                                break;
+                            case 'month':
+                                matchesDate = invoiceDate.getMonth() === today.getMonth() && 
+                                              invoiceDate.getFullYear() === today.getFullYear();
+                                break;
+                            case 'year':
+                                matchesDate = invoiceDate.getFullYear() === today.getFullYear();
+                                break;
+                        }
+                    }
+                    
+                    return matchesSearch && matchesStatus && matchesDate;
+                });
+                
+                renderInvoicesTable();
+            }
+            
+            // Function to open invoice modal
+                function openInvoiceModal(invoiceId = null) {
+                currentInvoiceId = invoiceId;
+                
+                // Reset form
+                document.getElementById('invoiceForm').reset();
+                
+                // Set today's date as default
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('invoiceDate').value = today;
+                
+                // Set due date (30 days from today)
+                const dueDate = new Date();
+                dueDate.setDate(dueDate.getDate() + 30);
+                document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
+                
+                // Generate invoice number
+                if (!invoiceId) {
+                    generateInvoiceNumber();
+                }
+                
+                // Clear items table
+                document.getElementById('itemsTableBody').innerHTML = '';
+                
+                // Add initial item
+                addItem();
+                
+                // Reset calculations
+                updateCalculations();
+                
+                // Set modal title
+                const modalLabel = document.getElementById('invoiceModalLabel');
+                if (invoiceId) {
+                    modalLabel.textContent = 'Edit Invoice';
+                    
+                    // Find invoice
+                    const invoice = invoices.find(i => i.id === invoiceId);
+                    if (invoice) {
+                        // Populate invoice details
+                        document.getElementById('invoiceNumber').value = invoice.number;
+                        document.getElementById('invoiceDate').value = invoice.date;
+                        document.getElementById('dueDate').value = invoice.dueDate;
+                        document.getElementById('invoiceStatus').value = invoice.status;
+                        document.getElementById('companySelect').value = invoice.companyId;
+                        document.getElementById('customerSelect').value = invoice.customerId;
+                        if (document.getElementById('transportMode')) {
+                            document.getElementById('transportMode').value = invoice.transportMode || 'road';
+                        }
+                        if (document.getElementById('vehicleRefNumber')) {
+                            document.getElementById('vehicleRefNumber').value = invoice.vehicleRefNumber || '';
+                        }
+                        document.getElementById('discountType').value = invoice.discountType || '';
+                        document.getElementById('discountValue').value = invoice.discountValue || '';
+                        document.getElementById('termsConditions').value = invoice.termsConditions || '';
+                        document.getElementById('notes').value = invoice.notes || '';
+                        
+                        // Populate items
+                        if (invoice.items && invoice.items.length > 0) {
+                            document.getElementById('itemsTableBody').innerHTML = '';
+                            invoice.items.forEach(function(item) {
+                                addItem(item);
+                            });
+                        }
+                        
+                        // Update calculations
+                        updateCalculations();
+                    }
+                } else {
+                    modalLabel.textContent = 'Create Invoice';
+                }
+                
+                // Show modal
+                const invoiceModal = new bootstrap.Modal(document.getElementById('invoiceModal'));
+                invoiceModal.show();
+            }
+            
+            // Function to generate invoice number
+            function generateInvoiceNumber() {
+                const today = new Date();
+                const year = today.getFullYear().toString().slice(-2);
+                const month = (today.getMonth() + 1).toString().padStart(2, '0');
+                
+                // Find existing invoices with the same year and month
+                const currentMonthInvoices = invoices.filter(function(invoice) {
+                    const invoiceDate = new Date(invoice.date);
+                    return invoiceDate.getFullYear() === today.getFullYear() && 
+                           invoiceDate.getMonth() === today.getMonth();
+                });
+                
+                // Generate sequence number
+                let sequence = 1;
+                if (currentMonthInvoices.length > 0) {
+                    // Extract sequence numbers from existing invoices
+                    const sequences = currentMonthInvoices.map(function(invoice) {
+                        const parts = invoice.number.split('-');
+                        return parseInt(parts[2]) || 0;
+                    });
+                    
+                    // Find the highest sequence number
+                    sequence = Math.max(...sequences) + 1;
+                }
+                
+                // Format sequence number with leading zeros
+                const sequenceStr = sequence.toString().padStart(3, '0');
+                
+                // Generate invoice number
+                const invoiceNumber = `INV-${year}-${month}-${sequenceStr}`;
+                document.getElementById('invoiceNumber').value = invoiceNumber;
+            }
+            
+            // Function to add item
+            function addItem(itemData = null) {
+                const itemsTableBody = document.getElementById('itemsTableBody');
+                const itemCount = itemsTableBody.children.length;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${itemCount + 1}</td>
+                    <td>
+                        <input type="text" class="form-control item-input" name="description" value="${itemData ? itemData.description : ''}" required>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control item-input" name="hsnSac" value="${itemData ? itemData.hsnSac : ''}">
+                    </td>
+                    <td>
+                        <input type="number" class="form-control item-input" name="quantity" value="${itemData ? itemData.quantity : 1}" min="1" step="1" required>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control item-input" name="unitPrice" value="${itemData ? itemData.unitPrice : 0}" min="0" step="0.01" required>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control item-input" name="gst" value="${itemData ? itemData.gst : 18}" min="0" max="28" step="0.01">
+                    </td>
+                    <td>
+                        <input type="number" class="form-control item-input" name="amount" value="${itemData ? itemData.amount : 0}" readonly>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-item-btn">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                itemsTableBody.appendChild(row);
+                
+                // Add event listeners to the new row
+                const quantityInput = row.querySelector('input[name="quantity"]');
+                const unitPriceInput = row.querySelector('input[name="unitPrice"]');
+                const gstInput = row.querySelector('input[name="gst"]');
+                const amountInput = row.querySelector('input[name="amount"]');
+                const removeBtn = row.querySelector('.remove-item-btn');
+                
+                quantityInput.addEventListener('input', function() {
+                    updateItemAmount(row);
+                    updateCalculations();
+                });
+                
+                unitPriceInput.addEventListener('input', function() {
+                    updateItemAmount(row);
+                    updateCalculations();
+                });
+                
+                gstInput.addEventListener('input', function() {
+                    updateCalculations();
+                });
+                
+                removeBtn.addEventListener('click', function() {
+                    if (itemsTableBody.children.length > 1) {
+                        row.remove();
+                        updateItemNumbers();
+                        updateCalculations();
+                    } else {
+                        showNotification('At least one item is required', 'warning');
+                    }
+                });
+                
+                // Update item amount if data is provided
+                if (itemData) {
+                    updateItemAmount(row);
+                }
+            }
+            
+            // Function to update item amount
+            function updateItemAmount(row) {
+                const quantity = parseFloat(row.querySelector('input[name="quantity"]').value) || 0;
+                const unitPrice = parseFloat(row.querySelector('input[name="unitPrice"]').value) || 0;
+                const amount = quantity * unitPrice;
+                
+                row.querySelector('input[name="amount"]').value = amount.toFixed(2);
+            }
+            
+            // Function to update item numbers
+            function updateItemNumbers() {
+                const rows = document.querySelectorAll('#itemsTableBody tr');
+                rows.forEach(function(row, index) {
+                    row.querySelector('td:first-child').textContent = index + 1;
+                });
+            }
+            
+            // Function to update calculations
+            function updateCalculations() {
+                let subtotal = 0;
+                let cgst = 0;
+                let sgst = 0;
+                let totalGst = 0;
+                
+                // Calculate subtotal and GST
+                const rows = document.querySelectorAll('#itemsTableBody tr');
+                rows.forEach(function(row) {
+                    const amount = parseFloat(row.querySelector('input[name="amount"]').value) || 0;
+                    const gstRate = parseFloat(row.querySelector('input[name="gst"]').value) || 0;
+                    
+                    subtotal += amount;
+                    
+                    // Calculate GST (assuming CGST and SGST are half of the total GST rate)
+                    const itemGst = amount * (gstRate / 100);
+                    cgst += itemGst / 2;
+                    sgst += itemGst / 2;
+                    totalGst += itemGst;
+                });
+                
+                // Calculate discount
+                const discountType = document.getElementById('discountType').value;
+                const discountValue = parseFloat(document.getElementById('discountValue').value) || 0;
+                
+                let discount = 0;
+                if (discountType === 'percentage') {
+                    discount = subtotal * (discountValue / 100);
+                } else if (discountType === 'fixed') {
+                    discount = discountValue;
+                }
+                
+                // Calculate total
+                const total = subtotal + totalGst - discount;
+                
+                // Update display
+                document.getElementById('subtotalDisplay').textContent = '₹' + subtotal.toFixed(2);
+                document.getElementById('cgstDisplay').textContent = '₹' + cgst.toFixed(2);
+                document.getElementById('sgstDisplay').textContent = '₹' + sgst.toFixed(2);
+                document.getElementById('totalGstDisplay').textContent = '₹' + totalGst.toFixed(2);
+                document.getElementById('discountDisplay').textContent = '₹' + discount.toFixed(2);
+                document.getElementById('totalDisplay').textContent = '₹' + total.toFixed(2);
+                
+                // Add amount in words (include paise)
+                const rupees = Math.floor(total);
+                const paisa = Math.round((total - rupees) * 100);
+                const parts = [];
+                if (rupees > 0) parts.push(numberToWords.toWords(rupees) + (rupees === 1 ? ' Rupee' : ' Rupees'));
+                if (paisa > 0) parts.push(numberToWords.toWords(paisa) + (paisa === 1 ? ' Paisa' : ' Paise'));
+                let words = parts.length > 0 ? parts.join(' and ') : 'zero Rupees';
+                words = words.charAt(0).toUpperCase() + words.slice(1) + ' Only';
+                // Convert to Title Case for display
+                const titleWords = toTitleCase(words);
+                document.getElementById('amountInWords').textContent = titleWords;
+                
+                // Update invoice preview
+                updateInvoicePreview();
+            }
+            
+            // Function to update invoice preview
+            function updateInvoicePreview() {
+                const previewContainer = document.getElementById('invoicePreview');
+                
+                // Get company and customer data
+                const companyId = document.getElementById('companySelect').value;
+                const customerId = document.getElementById('customerSelect').value;
+                
+                const company = companies.find(c => c.id === companyId);
+                const customer = customers.find(c => c.id === customerId);
+                
+                // Get invoice details
+                const invoiceNumber = document.getElementById('invoiceNumber').value;
+                const invoiceDate = document.getElementById('invoiceDate').value;
+                const dueDate = document.getElementById('dueDate').value;
+                const termsConditions = document.getElementById('termsConditions').value;
+                const notes = document.getElementById('notes').value;
+                
+                // Get items
+                const items = [];
+                const rows = document.querySelectorAll('#itemsTableBody tr');
+                rows.forEach(function(row) {
+                    const description = row.querySelector('input[name="description"]').value;
+                    const hsnSac = row.querySelector('input[name="hsnSac"]').value;
+                    const quantity = row.querySelector('input[name="quantity"]').value;
+                    const unitPrice = row.querySelector('input[name="unitPrice"]').value;
+                    const gst = row.querySelector('input[name="gst"]').value;
+                    const amount = row.querySelector('input[name="amount"]').value;
+                    
+                    items.push({
+                        description,
+                        hsnSac,
+                        quantity,
+                        unitPrice,
+                        gst,
+                        amount
+                    });
+                });
+                
+                // Get summary values
+                const subtotal = document.getElementById('subtotalDisplay').textContent;
+                const cgst = document.getElementById('cgstDisplay').textContent;
+                const sgst = document.getElementById('sgstDisplay').textContent;
+                const totalGst = document.getElementById('totalGstDisplay').textContent;
+                const discount = document.getElementById('discountDisplay').textContent;
+                const total = document.getElementById('totalDisplay').textContent;
+                const amountInWords = document.getElementById('amountInWords').textContent;
+                
+                // Generate preview HTML
+                let previewHTML = `
+                    <div class="invoice-header">
+                        <div>
+                            <div class="invoice-title">Tax Invoice</div>
+                            <div class="invoice-details">
+                                <div class="invoice-details-row">
+                                    <div class="invoice-details-label">Invoice No:</div>
+                                    <div>${invoiceNumber}</div>
+                                </div>
+                                <div class="invoice-details-row">
+                                    <div class="invoice-details-label">Date:</div>
+                                    <div>${formatDate(invoiceDate)}</div>
+                                </div>
+                                <div class="invoice-details-row">
+                                    <div class="invoice-details-label">Due Date:</div>
+                                    <div>${formatDate(dueDate)}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6>Company Details</h6>
+                            <div>
+                                <strong>${company ? company.name : 'Company Name'}</strong><br>
+                                ${company ? company.address : 'Company Address'}<br>
+                                ${company ? company.email : 'company@example.com'}<br>
+                                ${company ? company.phone : '1234567890'}<br>
+                                ${company ? `GSTIN: ${company.gstin}` : ''}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Customer Details</h6>
+                            <div>
+                                <strong>${customer ? customer.name : 'Customer Name'}</strong><br>
+                                ${customer ? customer.address : 'Customer Address'}<br>
+                                ${customer ? customer.email : 'customer@example.com'}<br>
+                                ${customer ? customer.phone : '1234567890'}<br>
+                                ${customer ? `GSTIN: ${customer.gstin}` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="invoice-table-container">
+                        <table class="invoice-table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>HSN/SAC</th>
+                                    <th>Qty</th>
+                                    <th>Unit Price</th>
+                                    <th>GST (%)</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                items.forEach(function(item) {
+                    previewHTML += `
+                        <tr>
+                            <td>${item.description}</td>
+                            <td>${item.hsnSac}</td>
+                            <td>${item.quantity}</td>
+                            <td>₹${parseFloat(item.unitPrice).toFixed(2)}</td>
+                            <td>${item.gst}%</td>
+                            <td>₹${parseFloat(item.amount).toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+                
+                previewHTML += `
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="invoice-summary">
+                        <table>
+                            <tr>
+                                <td>Subtotal:</td>
+                                <td>${subtotal}</td>
+                            </tr>
+                            <tr>
+                                <td>CGST:</td>
+                                <td>${cgst}</td>
+                            </tr>
+                            <tr>
+                                <td>SGST:</td>
+                                <td>${sgst}</td>
+                            </tr>
+                            <tr>
+                                <td>Total GST:</td>
+                                <td>${totalGst}</td>
+                            </tr>
+                            <tr>
+                                <td>Discount:</td>
+                                <td>${discount}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total:</strong></td>
+                                <td><strong>${total}</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Amount in Words:</td>
+                                <td>${amountInWords}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    ${termsConditions ? `
+                        <div class="mt-3">
+                            <h6>Terms and Conditions</h6>
+                            <p>${termsConditions}</p>
+                        </div>
+                    ` : ''}
+                    
+                    ${notes ? `
+                        <div class="mt-3">
+                            <h6>Notes</h6>
+                            <p>${notes}</p>
+                        </div>
+                    ` : ''}
+                `;
+                
+                previewContainer.innerHTML = previewHTML;
+                
+                // Inline summary QR removed
+            }
+            
+            // Function to save invoice
+            function saveInvoice() {
+                // Validate form
+                const form = document.getElementById('invoiceForm');
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+                
+                // Get form data
+                const invoiceData = {
+                    number: document.getElementById('invoiceNumber').value,
+                    date: document.getElementById('invoiceDate').value,
+                    dueDate: document.getElementById('dueDate').value,
+                    status: document.getElementById('invoiceStatus').value,
+                    companyId: document.getElementById('companySelect').value,
+                    customerId: document.getElementById('customerSelect').value,
+                    transportMode: document.getElementById('transportMode').value,
+                    vehicleRefNumber: document.getElementById('vehicleRefNumber').value,
+                    discountType: document.getElementById('discountType').value,
+                    discountValue: parseFloat(document.getElementById('discountValue').value) || 0,
+                    termsConditions: document.getElementById('termsConditions').value,
+                    notes: document.getElementById('notes').value,
+                    subtotal: parseFloat(document.getElementById('subtotalDisplay').textContent.replace('₹', '')),
+                    cgst: parseFloat(document.getElementById('cgstDisplay').textContent.replace('₹', '')),
+                    sgst: parseFloat(document.getElementById('sgstDisplay').textContent.replace('₹', '')),
+                    totalGst: parseFloat(document.getElementById('totalGstDisplay').textContent.replace('₹', '')),
+                    discount: parseFloat(document.getElementById('discountDisplay').textContent.replace('₹', '')),
+                    total: parseFloat(document.getElementById('totalDisplay').textContent.replace('₹', '')),
+                    amountInWords: document.getElementById('amountInWords').textContent
+                };
+                
+                // Get items
+                invoiceData.items = [];
+                const rows = document.querySelectorAll('#itemsTableBody tr');
+                rows.forEach(function(row) {
+                    const description = row.querySelector('input[name="description"]').value;
+                    const hsnSac = row.querySelector('input[name="hsnSac"]').value;
+                    const quantity = parseFloat(row.querySelector('input[name="quantity"]').value) || 0;
+                    const unitPrice = parseFloat(row.querySelector('input[name="unitPrice"]').value) || 0;
+                    const gst = parseFloat(row.querySelector('input[name="gst"]').value) || 0;
+                    const amount = parseFloat(row.querySelector('input[name="amount"]').value) || 0;
+                    
+                    invoiceData.items.push({
+                        description,
+                        hsnSac,
+                        quantity,
+                        unitPrice,
+                        gst,
+                        amount
+                    });
+                });
+                
+                // Show loading overlay
+                document.getElementById('loadingOverlay').classList.add('active');
+                
+                if (currentInvoiceId) {
+                    // Update existing invoice
+                    const index = invoices.findIndex(i => i.id === currentInvoiceId);
+                    if (index !== -1) {
+                        // Preserve ID and creation date
+                        invoiceData.id = currentInvoiceId;
+                        invoiceData.createdAt = invoices[index].createdAt;
+                        invoiceData.updatedAt = new Date().toISOString();
+                        
+                        // Update invoice
+                        invoices[index] = invoiceData;
+                    }
+                } else {
+                    // Add new invoice
+                    const newInvoice = {
+                        id: generateId(),
+                        ...invoiceData,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    };
+                    invoices.push(newInvoice);
+                }
+                
+                // Save to local storage
+                localforage.setItem('invoices', invoices)
+                    .then(function() {
+                        // Update filtered invoices
+                        filteredInvoices = [...invoices];
+                        
+                        // Render invoices table
+                        renderInvoicesTable();
+                        
+                        // Hide modal
+                        const invoiceModal = bootstrap.Modal.getInstance(document.getElementById('invoiceModal'));
+                        invoiceModal.hide();
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        
+                        // Show success message
+                        showNotification('Invoice saved successfully', 'success');
+                    })
+                    .catch(function(err) {
+                        console.error('Error saving invoice:', err);
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        
+                        // Show error message
+                        showNotification('Error saving invoice', 'danger');
+                    });
+            }
+            
+            // Function to preview invoice
+            function previewInvoice() {
+                // Validate form
+                const form = document.getElementById('invoiceForm');
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+                
+                // Get invoice data
+                const invoiceData = {
+                    number: document.getElementById('invoiceNumber').value,
+                    date: document.getElementById('invoiceDate').value,
+                    dueDate: document.getElementById('dueDate').value,
+                    status: document.getElementById('invoiceStatus').value,
+                    companyId: document.getElementById('companySelect').value,
+                    customerId: document.getElementById('customerSelect').value,
+                    transportMode: document.getElementById('transportMode').value,
+                    vehicleRefNumber: document.getElementById('vehicleRefNumber').value,
+                    discountType: document.getElementById('discountType').value,
+                    discountValue: parseFloat(document.getElementById('discountValue').value) || 0,
+                    termsConditions: document.getElementById('termsConditions').value,
+                    notes: document.getElementById('notes').value,
+                    subtotal: parseFloat(document.getElementById('subtotalDisplay').textContent.replace('₹', '')),
+                    cgst: parseFloat(document.getElementById('cgstDisplay').textContent.replace('₹', '')),
+                    sgst: parseFloat(document.getElementById('sgstDisplay').textContent.replace('₹', '')),
+                    totalGst: parseFloat(document.getElementById('totalGstDisplay').textContent.replace('₹', '')),
+                    discount: parseFloat(document.getElementById('discountDisplay').textContent.replace('₹', '')),
+                    total: parseFloat(document.getElementById('totalDisplay').textContent.replace('₹', '')),
+                    amountInWords: document.getElementById('amountInWords').textContent
+                };
+                
+                // Get items
+                invoiceData.items = [];
+                const rows = document.querySelectorAll('#itemsTableBody tr');
+                rows.forEach(function(row) {
+                    const description = row.querySelector('input[name="description"]').value;
+                    const hsnSac = row.querySelector('input[name="hsnSac"]').value;
+                    const quantity = parseFloat(row.querySelector('input[name="quantity"]').value) || 0;
+                    const unitPrice = parseFloat(row.querySelector('input[name="unitPrice"]').value) || 0;
+                    const gst = parseFloat(row.querySelector('input[name="gst"]').value) || 0;
+                    const amount = parseFloat(row.querySelector('input[name="amount"]').value) || 0;
+                    
+                    invoiceData.items.push({
+                        description,
+                        hsnSac,
+                        quantity,
+                        unitPrice,
+                        gst,
+                        amount
+                    });
+                });
+                
+                // Set preview invoice ID
+                previewInvoiceId = currentInvoiceId || 'preview';
+                
+                // Set selected export type
+                selectedExportType = 'tax-invoice';
+                
+                // Select the corresponding export option
+                document.querySelectorAll('.export-option').forEach(function(opt) {
+                    opt.classList.remove('selected');
+                    if (opt.getAttribute('data-type') === selectedExportType) {
+                        opt.classList.add('selected');
+                    }
+                });
+                
+                // Generate preview
+                generatePreview(previewInvoiceId, selectedExportType, invoiceData);
+                
+                // Show preview modal
+                const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+                previewModal.show();
+            }
+            
+            // Function to generate preview
+            function generatePreview(invoiceId, exportType, invoiceData = null) {
+                let invoice;
+                
+                if (invoiceData) {
+                    // Use provided invoice data
+                    invoice = invoiceData;
+                } else {
+                    // Find invoice
+                    invoice = invoices.find(i => i.id === invoiceId);
+                    if (!invoice) {
+                        showNotification('Invoice not found', 'danger');
+                        return;
+                    }
+                }
+                
+                // Get company and customer data
+                const company = companies.find(c => c.id === invoice.companyId);
+                const customer = customers.find(c => c.id === invoice.customerId);
+                
+                // Generate preview HTML based on export type
+                let previewHTML = '';
+                
+                switch(exportType) {
+                    case 'invoice':
+                        previewHTML = generateInvoicePreview(invoice, company, customer, false);
+                        break;
+                    case 'tax-invoice':
+                        previewHTML = generateInvoicePreview(invoice, company, customer, true);
+                        break;
+                    case 'delivery-challan':
+                        previewHTML = generateDeliveryChallanPreview(invoice, company, customer);
+                        break;
+                    default:
+                        previewHTML = generateInvoicePreview(invoice, company, customer, true);
+                }
+                
+                document.getElementById('previewContent').innerHTML = previewHTML;
+                // Generate QR code for preview modal with detailed invoice info (if placeholder exists)
+                try {
+                    const previewQrcode = document.getElementById('preview-qrcode');
+                    if (previewQrcode) {
+                        previewQrcode.innerHTML = '';
+
+                        // Compact preview QR payload (pipe-separated). Truncate long names to keep size down.
+                        const safe = s => String(s || '').replace(/\s+/g, ' ').trim().slice(0, 40);
+                        let previewQrText = `INV|${encodeURIComponent(invoice.number||'')}|D:${encodeURIComponent(invoice.date||'')}|TD:${encodeURIComponent(invoice.dueDate||'')}|T:${encodeURIComponent(invoice.total||'')}`;
+                        previewQrText += `|S:${encodeURIComponent(invoice.subtotal||'')}`;
+                        if (company && company.name) previewQrText += `|C:${encodeURIComponent(safe(company.name))}`;
+                        if (customer && customer.name) previewQrText += `|U:${encodeURIComponent(safe(customer.name))}`;
+
+                        if (previewQrText.length > 1000) {
+                            previewQrText = invoice.number || previewQrText.slice(0, 1000);
+                        }
+
+                        new QRCode(previewQrcode, {
+                            text: previewQrText,
+                            width: 120,
+                            height: 120
+                        });
+                    }
+                } catch (err) {
+                    console.error('Error generating preview QR code:', err);
+                }
+            }
+            
+            // Function to generate invoice preview
+            function generateInvoicePreview(invoice, company, customer, includeTax) {
+                let title = includeTax ? 'Tax Invoice' : 'Invoice';
+                
+                let previewHTML = `
+                    <div class="invoice-header">
+                        <div>
+                            <div class="invoice-title">${title}</div>
+                            <div class="invoice-details">
+                                <div class="invoice-details-row">
+                                    <div class="invoice-details-label">Invoice No:</div>
+                                    <div>${invoice.number}</div>
+                                </div>
+                                <div class="invoice-details-row">
+                                    <div class="invoice-details-label">Date:</div>
+                                    <div>${formatDate(invoice.date)}</div>
+                                </div>
+                                <div class="invoice-details-row">
+                                    <div class="invoice-details-label">Due Date:</div>
+                                    <div>${formatDate(invoice.dueDate)}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="qr-code-container">
+                            <div id="preview-qrcode"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6>Company Details</h6>
+                            <div>
+                                <strong>${company ? company.name : 'Company Name'}</strong><br>
+                                ${company ? company.address : 'Company Address'}<br>
+                                ${company ? company.email : 'company@example.com'}<br>
+                                ${company ? company.phone : '1234567890'}<br>
+                                ${company ? `GSTIN: ${company.gstin}` : ''}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Customer Details</h6>
+                            <div>
+                                <strong>${customer ? customer.name : 'Customer Name'}</strong><br>
+                                ${customer ? customer.address : 'Customer Address'}<br>
+                                ${customer ? customer.email : 'customer@example.com'}<br>
+                                ${customer ? customer.phone : '1234567890'}<br>
+                                ${customer ? `GSTIN: ${customer.gstin}` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="invoice-table-container">
+                        <table class="invoice-table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    ${includeTax ? '<th>HSN/SAC</th>' : ''}
+                                    <th>Qty</th>
+                                    <th>Unit Price</th>
+                                    ${includeTax ? '<th>GST (%)</th>' : ''}
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                invoice.items.forEach(function(item) {
+                    previewHTML += `
+                        <tr>
+                            <td>${item.description}</td>
+                            ${includeTax ? `<td>${item.hsnSac}</td>` : ''}
+                            <td>${item.quantity}</td>
+                            <td>₹${parseFloat(item.unitPrice).toFixed(2)}</td>
+                            ${includeTax ? `<td>${item.gst}%</td>` : ''}
+                            <td>₹${parseFloat(item.amount).toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+                
+                previewHTML += `
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="invoice-summary">
+                        <table>
+                            <tr>
+                                <td>Subtotal:</td>
+                                <td>₹${invoice.subtotal.toFixed(2)}</td>
+                            </tr>
+                `;
+                
+                if (includeTax) {
+                    previewHTML += `
+                        <tr>
+                            <td>CGST:</td>
+                            <td>₹${invoice.cgst.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td>SGST:</td>
+                            <td>₹${invoice.sgst.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td>Total GST:</td>
+                            <td>₹${invoice.totalGst.toFixed(2)}</td>
+                        </tr>
+                    `;
+                }
+                
+                previewHTML += `
+                            <tr>
+                                <td>Discount:</td>
+                                <td>₹${invoice.discount.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total:</strong></td>
+                                <td><strong>₹${invoice.total.toFixed(2)}</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Amount in Words:</td>
+                                <td>${invoice.amountInWords}</td>
+                            </tr>
+                        </table>
+                    </div>
+                `;
+                
+                if (invoice.termsConditions) {
+                    previewHTML += `
+                        <div class="mt-3">
+                            <h6>Terms and Conditions</h6>
+                            <p>${invoice.termsConditions}</p>
+                        </div>
+                    `;
+                }
+                
+                if (invoice.notes) {
+                    previewHTML += `
+                        <div class="mt-3">
+                            <h6>Notes</h6>
+                            <p>${invoice.notes}</p>
+                        </div>
+                    `;
+                }
+                
+                return previewHTML;
+            }
+            
+            // Function to generate delivery challan preview
+            function generateDeliveryChallanPreview(invoice, company, customer) {
+                let previewHTML = `
+                    <div class="invoice-header">
+                        <div>
+                            <div class="invoice-title">Delivery Challan</div>
+                            <div class="invoice-details">
+                                <div class="invoice-details-row">
+                                    <div class="invoice-details-label">Challan No:</div>
+                                    <div>${invoice.number.replace('INV', 'DC')}</div>
+                                </div>
+                                <div class="invoice-details-row">
+                                    <div class="invoice-details-label">Date:</div>
+                                    <div>${formatDate(invoice.date)}</div>
+                                </div>
+                                <div class="invoice-details-row">
+                                    <div class="invoice-details-label">Reference Invoice:</div>
+                                    <div>${invoice.number}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="qr-code-container">
+                            <div id="preview-qrcode"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6>Supplier Details</h6>
+                            <div>
+                                <strong>${company ? company.name : 'Company Name'}</strong><br>
+                                ${company ? company.address : 'Company Address'}<br>
+                                ${company ? company.email : 'company@example.com'}<br>
+                                ${company ? company.phone : '1234567890'}<br>
+                                ${company ? `GSTIN: ${company.gstin}` : ''}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Consignee Details</h6>
+                            <div>
+                                <strong>${customer ? customer.name : 'Customer Name'}</strong><br>
+                                ${customer ? customer.address : 'Customer Address'}<br>
+                                ${customer ? customer.email : 'customer@example.com'}<br>
+                                ${customer ? customer.phone : '1234567890'}<br>
+                                ${customer ? `GSTIN: ${customer.gstin}` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6>Mode of Transport</h6>
+                            <div>
+                                ${(() => {
+                                    const m = (invoice.transportMode || '').toLowerCase();
+                                    if (m === 'rail') return 'Rail';
+                                    if (m === 'air') return 'Air';
+                                    if (m === 'sea') return 'Sea';
+                                    if (m === 'courier') return 'Courier';
+                                    return 'Road';
+                                })()}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Vehicle/Reference Number</h6>
+                            <div>
+                                ${invoice.vehicleRefNumber ? invoice.vehicleRefNumber : ''}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="invoice-table-container">
+                        <table class="invoice-table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>HSN/SAC</th>
+                                    <th>Qty</th>
+                                    <th>Unit Price</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                invoice.items.forEach(function(item) {
+                    previewHTML += `
+                        <tr>
+                            <td>${item.description}</td>
+                            <td>${item.hsnSac}</td>
+                            <td>${item.quantity}</td>
+                            <td>₹${parseFloat(item.unitPrice).toFixed(2)}</td>
+                            <td>₹${parseFloat(item.amount).toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+                
+                previewHTML += `
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="invoice-summary">
+                        <table>
+                            <tr>
+                                <td>Subtotal:</td>
+                                <td>₹${invoice.subtotal.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total:</strong></td>
+                                <td><strong>₹${invoice.total.toFixed(2)}</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Amount in Words:</td>
+                                <td>${invoice.amountInWords}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h6>Receiver's Signature</h6>
+                            <div style="height: 100px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center;">
+                                <span class="text-muted">Signature</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Supplier's Signature</h6>
+                            <div style="height: 100px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center;">
+                                <span class="text-muted">Signature</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                return previewHTML;
+            }
+            
+            // Function to open preview modal
+            function openPreviewModal(invoiceId) {
+                previewInvoiceId = invoiceId;
+                
+                // Set selected export type
+                selectedExportType = 'tax-invoice';
+                
+                // Select the corresponding export option
+                document.querySelectorAll('.export-option').forEach(function(opt) {
+                    opt.classList.remove('selected');
+                    if (opt.getAttribute('data-type') === selectedExportType) {
+                        opt.classList.add('selected');
+                    }
+                });
+                
+                // Generate preview
+                generatePreview(previewInvoiceId, selectedExportType);
+                
+                // Show preview modal
+                const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+                previewModal.show();
+            }
+            
+            // Function to generate PDF (core)
+            function generatePDFForType(invoiceId, exportType) {
+                // Show loading overlay
+                document.getElementById('loadingOverlay').classList.add('active');
+                
+                // Find invoice
+                const invoice = invoices.find(i => i.id === invoiceId);
+                if (!invoice) {
+                    showNotification('Invoice not found', 'danger');
+                    document.getElementById('loadingOverlay').classList.remove('active');
+                    return;
+                }
+                
+                // Get company and customer data
+                const company = companies.find(c => c.id === invoice.companyId);
+                const customer = customers.find(c => c.id === invoice.customerId);
+                
+                // Create a new jsPDF instance
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                if (company && company.logo) {
+                    try {
+                        doc.addImage(company.logo, 'PNG', 15, 15, 30, 30);
+                    } catch (e) {}
+                }
+                
+                // Set font size
+                doc.setFontSize(12);
+                
+                // Add title
+                let title = '';
+                switch(exportType) {
+                    case 'invoice':
+                        title = 'Invoice';
+                        break;
+                    case 'tax-invoice':
+                        title = 'Tax Invoice';
+                        break;
+                    case 'delivery-challan':
+                        title = 'Delivery Challan';
+                        break;
+                    default:
+                        title = 'Invoice';
+                }
+                
+                doc.setFontSize(20);
+                doc.text(title, 105, 30, { align: 'center' });
+                
+                // Add invoice details
+                doc.setFontSize(11);
+                let yPos = (company && company.logo) ? 55 : 35;
+                let billFromBottomY = 0;
+                let billToBottomY = 0;
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const bottomMargin = 20;
+                function ensureSpace(required) {
+                    if (yPos + required > pageHeight - bottomMargin) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+                }
+                
+                if (exportType === 'delivery-challan') {
+                    doc.text(`Challan No: ${invoice.number.replace('INV', 'DC')}`, 14, yPos);
+                    yPos += 7;
+                    doc.text(`Reference Invoice: ${invoice.number}`, 14, yPos);
+                } else {
+                    doc.text(`Invoice No: ${invoice.number}`, 14, yPos);
+                }
+                
+                yPos += 7;
+                doc.text(`Date: ${formatDate(invoice.date)}`, 14, yPos);
+                
+                
+                if (company) {
+                    doc.setFontSize(12);
+                    doc.text('Bill From:', 105, 50);
+                    doc.setFontSize(12);
+                    doc.text(company.name, 105, 57);
+                    billFromBottomY = 57;
+                    if (company.address) {
+                        const splitAddress = doc.splitTextToSize(company.address, 90);
+                        doc.text(splitAddress, 105, 64);
+                        billFromBottomY = 64 + (splitAddress.length - 1) * 5;
+                    }
+                    if (company.email) {
+                        doc.text(`Email: ${company.email}`, 105, 75);
+                        billFromBottomY = Math.max(billFromBottomY, 75);
+                    }
+                    if (company.phone) {
+                        doc.text(`Phone: ${company.phone}`, 105, 82);
+                        billFromBottomY = Math.max(billFromBottomY, 82);
+                    }
+                    if (exportType === 'tax-invoice' && company.gstin) {
+                        doc.text(`GSTIN: ${company.gstin}`, 105, 89);
+                        billFromBottomY = Math.max(billFromBottomY, 89);
+                    }
+                }
+                if (customer) {
+                    doc.setFontSize(12);
+                    doc.text('Bill To:', 15, 80);
+                    doc.setFontSize(12);
+                    doc.text(customer.name, 15, 87);
+                    billToBottomY = 87;
+                    if (customer.address) {
+                        const splitAddress = doc.splitTextToSize(customer.address, 90);
+                        doc.text(splitAddress, 15, 94);
+                        billToBottomY = 94 + (splitAddress.length - 1) * 5;
+                    }
+                    if (customer.email) {
+                        doc.text(`Email: ${customer.email}`, 15, 105);
+                        billToBottomY = Math.max(billToBottomY, 105);
+                    }
+                    if (customer.phone) {
+                        doc.text(`Phone: ${customer.phone}`, 15, 112);
+                        billToBottomY = Math.max(billToBottomY, 112);
+                    }
+                    if (exportType === 'tax-invoice' && customer.gstin) {
+                        doc.text(`GSTIN: ${customer.gstin}`, 15, 119);
+                        billToBottomY = Math.max(billToBottomY, 119);
+                    }
+                }
+                
+                // Add transport details for delivery challan
+                if (exportType === 'delivery-challan') {
+                    doc.setFontSize(12);
+                    const m = String(invoice.transportMode || '').toLowerCase();
+                    const modeText = m === 'rail' ? 'Rail' : m === 'air' ? 'Air' : m === 'sea' ? 'Sea' : m === 'courier' ? 'Courier' : 'Road';
+                    const transportY = Math.max(billFromBottomY, 60) + 10;
+                    doc.text(`Mode of Transport: ${modeText}`, 105, transportY);
+                    doc.text(`Vehicle/Reference: ${invoice.vehicleRefNumber || ''}`, 105, transportY + 7);
+                }
+                
+                yPos = Math.max(billToBottomY, billFromBottomY) + 10;
+                
+                const tableData = [];
+                let totalQty = 0;
+                invoice.items.forEach(function(item, idx) {
+                    if (exportType === 'delivery-challan') {
+                        const q = parseFloat(item.quantity) || 0;
+                        totalQty += q;
+                        tableData.push([
+                            String(idx + 1),
+                            item.description,
+                            String(item.quantity)
+                        ]);
+                    } else if (exportType === 'tax-invoice') {
+                        tableData.push([
+                            String(idx + 1),
+                            item.description,
+                            item.hsnSac || '',
+                            String(item.quantity),
+                            `Rs. ${parseFloat(item.unitPrice).toFixed(2)}`,
+                            `${item.gst}%`,
+                            `Rs. ${parseFloat(item.amount).toFixed(2)}`
+                        ]);
+                    } else {
+                        tableData.push([
+                            String(idx + 1),
+                            item.description,
+                            String(item.quantity),
+                            `Rs. ${parseFloat(item.unitPrice).toFixed(2)}`,
+                            `Rs. ${parseFloat(item.amount).toFixed(2)}`
+                        ]);
+                    }
+                });
+                
+                // Define table headers
+                let headers = ['S.No', 'Description'];
+                if (exportType === 'delivery-challan') {
+                    headers = ['S.No', 'Description', 'Quantity'];
+                } else if (exportType === 'tax-invoice') {
+                    headers = ['S.No', 'Description', 'HSN/SAC', 'Qty', 'Unit Price', 'GST (%)', 'Amount'];
+                } else {
+                    headers = ['S.No', 'Description', 'Quantity', 'Unit Price', 'Amount'];
+                }
+                
+                // Add table
+                doc.autoTable({
+                    head: [headers],
+                    body: tableData,
+                    startY: yPos,
+                    theme: 'striped',
+                    headStyles: {
+                        fillColor: [74, 108, 247]
+                    }
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 10;
+                
+                if (exportType !== 'delivery-challan') {
+                    const summaryBody = [];
+                    summaryBody.push(['Subtotal:', `Rs. ${invoice.subtotal.toFixed(2)}`]);
+                    if (exportType === 'tax-invoice') {
+                        summaryBody.push(['CGST:', `Rs. ${invoice.cgst.toFixed(2)}`]);
+                        summaryBody.push(['SGST:', `Rs. ${invoice.sgst.toFixed(2)}`]);
+                        summaryBody.push(['Total GST:', `Rs. ${invoice.totalGst.toFixed(2)}`]);
+                    }
+                    summaryBody.push(['Discount:', `Rs. ${invoice.discount.toFixed(2)}`]);
+                    summaryBody.push(['Total:', `Rs. ${invoice.total.toFixed(2)}`]);
+
+                    doc.autoTable({
+                        body: summaryBody,
+                        startY: yPos,
+                        theme: 'plain',
+                        tableWidth: 'wrap',
+                        margin: { left: 14 },
+                        styles: {
+                            cellPadding: { top: 2, right: 2, bottom: 2, left: 2 },
+                            fontSize: 10
+                        },
+                        columnStyles: {
+                            0: { fontStyle: 'bold', halign: 'left', cellWidth: 38 },
+                            1: { halign: 'left', cellWidth: 62 }
+                        }
+                    });
+
+                    yPos = doc.lastAutoTable.finalY + 10;
+                    doc.setFontSize(10);
+                    const pdfRupees = Math.floor(invoice.total);
+                    const pdfPaisa = Math.round((invoice.total - pdfRupees) * 100);
+                    const pdfParts = [];
+                    if (pdfRupees > 0) pdfParts.push(numberToWords.toWords(pdfRupees) + (pdfRupees === 1 ? ' Rupee' : ' Rupees'));
+                    if (pdfPaisa > 0) pdfParts.push(numberToWords.toWords(pdfPaisa) + (pdfPaisa === 1 ? ' Paisa' : ' Paise'));
+                    let pdfWords = pdfParts.length > 0 ? pdfParts.join(' and ') : 'zero Rupees';
+                    pdfWords = pdfWords.charAt(0).toUpperCase() + pdfWords.slice(1) + ' Only';
+                    const titlePdfWords = toTitleCase(pdfWords);
+                    ensureSpace(20);
+                    doc.text(`Amount in Words: ${titlePdfWords}`, 14, yPos);
+                    yPos += 10;
+                    // Bank Details & UPI (if available)
+                    if (company && (company.bankName || company.accountName || company.accountNumber || company.ifscCode || company.accountType || company.upiId || company.upiQrCode)) {
+                        const estimatedLines = (company.bankName?1:0) + (company.accountName?1:0) + (company.accountNumber?1:0) + (company.ifscCode?1:0) + (company.accountType?1:0);
+                        const estLeftHeight = 7 + estimatedLines*5 + 12;
+                        const estRightHeight = (company.upiQrCode?30:0) + (company.upiId?6:0);
+                        ensureSpace(Math.max(estLeftHeight, estRightHeight) + 10);
+                        doc.setFontSize(12);
+                        doc.text('Bank Details & UPI', 14, yPos);
+                        yPos += 7;
+                        doc.setFontSize(10);
+                        const detailsStartY = yPos;
+                        // Left block: bank details
+                        if (company.bankName) { doc.text(`Bank: ${company.bankName}`, 14, yPos); yPos += 5; }
+                        if (company.accountName) { doc.text(`Account Name: ${company.accountName}`, 14, yPos); yPos += 5; }
+                        if (company.accountNumber) { doc.text(`Account No: ${company.accountNumber}`, 14, yPos); yPos += 5; }
+                        if (company.ifscCode) { doc.text(`IFSC: ${company.ifscCode}`, 14, yPos); yPos += 5; }
+                        if (company.accountType) { doc.text(`Account Type: ${company.accountType}`, 14, yPos); yPos += 5; }
+                        const leftEndY = yPos;
+                        const leftHeight = leftEndY - detailsStartY;
+                        // Right block: UPI QR + ID, aligned top and bottom
+                        const qrX = 140;
+                        let qrSize = Math.max(24, Math.min(50, leftHeight - 11)); // 11 accounts for label and gap
+                        const upiLabelGap = 6;
+                        const qrY = detailsStartY;
+                        if (company.upiQrCode) {
+                            try { doc.addImage(company.upiQrCode, 'PNG', qrX, qrY, qrSize, qrSize); } catch (e) {}
+                        }
+                        const upiLabelY = qrY + qrSize + upiLabelGap;
+                        if (company.upiId) {
+                            doc.text(`${company.upiId}`, qrX + qrSize / 2, upiLabelY, { align: 'center' });
+                        }
+                        const rightEndY = upiLabelY;
+                        yPos = Math.max(leftEndY, rightEndY) + 5;
+                    }
+                } else {
+                    const summaryBody = [['Total Quantity:', String(totalQty)]];
+                    doc.autoTable({
+                        body: summaryBody,
+                        startY: yPos,
+                        theme: 'plain',
+                        tableWidth: 'wrap',
+                        margin: { left: 14 },
+                        styles: { cellPadding: { top: 2, right: 2, bottom: 2, left: 2 }, fontSize: 10 },
+                        columnStyles: { 0: { fontStyle: 'bold', halign: 'left', cellWidth: 38 }, 1: { halign: 'left', cellWidth: 62 } }
+                    });
+                    yPos = doc.lastAutoTable.finalY + 10;
+                }
+                
+                if (invoice.termsConditions) {
+                    const splitTerms = doc.splitTextToSize(invoice.termsConditions, 180);
+                    const blockHeight = 5 + 12 + 7 + splitTerms.length * 5;
+                    ensureSpace(blockHeight);
+                    yPos += 5;
+                    doc.setFontSize(12);
+                    doc.text('Terms and Conditions', 14, yPos);
+                    yPos += 7;
+                    doc.setFontSize(10);
+                    doc.text(splitTerms, 14, yPos);
+                    yPos += splitTerms.length * 5;
+                }
+                
+                if (invoice.notes) {
+                    const splitNotes = doc.splitTextToSize(invoice.notes, 180);
+                    const blockHeight = 5 + 12 + 7 + splitNotes.length * 5;
+                    ensureSpace(blockHeight);
+                    yPos += 5;
+                    doc.setFontSize(12);
+                    doc.text('Notes', 14, yPos);
+                    yPos += 7;
+                    doc.setFontSize(10);
+                    doc.text(splitNotes, 14, yPos);
+                    yPos += splitNotes.length * 5;
+                }
+                
+                
+                
+                let fileName = 'Invoice.pdf';
+                if (exportType === 'tax-invoice') fileName = `TaxInvoice_${invoice.number}.pdf`;
+                else if (exportType === 'delivery-challan') fileName = `DeliveryChallan_${invoice.number.replace('INV','DC')}.pdf`;
+                else fileName = `Invoice_${invoice.number}.pdf`;
+                // Authorized signature for invoice and tax-invoice at bottom right of last page
+                if (exportType === 'invoice' || exportType === 'tax-invoice') {
+                    try {
+                        const pageCount = typeof doc.getNumberOfPages === 'function' ? doc.getNumberOfPages() : doc.internal.getNumberOfPages();
+                        doc.setPage(pageCount);
+                        const pageWidth = doc.internal.pageSize.getWidth();
+                        const pageHeight = doc.internal.pageSize.getHeight();
+                        const sigW = 40, sigH = 20;
+                        const x = pageWidth - 14 - sigW;
+                        const footerBaseline = pageHeight - 10;
+                        const captionY = footerBaseline - 12;
+                        const y = captionY - sigH - 2;
+                        if (company && company.signature) {
+                            try {
+                                doc.addImage(company.signature, 'PNG', x, y, sigW, sigH);
+                            } catch (e) {
+                                doc.line(x, y + sigH, x + sigW, y + sigH);
+                            }
+                        } else {
+                            doc.line(x, y + sigH, x + sigW, y + sigH);
+                        }
+                        doc.setFontSize(10);
+                        doc.text('Authorized Signature', x + sigW / 2, captionY, { align: 'center' });
+                    } catch (e) {}
+                }
+                if (exportType === 'delivery-challan') {
+                    try {
+                        const footerText = 'This is a Computer Generated Delivery Challan';
+                        const pageCount = typeof doc.getNumberOfPages === 'function' ? doc.getNumberOfPages() : doc.internal.getNumberOfPages();
+                        doc.setPage(pageCount);
+                        const pageWidth = doc.internal.pageSize.getWidth();
+                        const pageHeight = doc.internal.pageSize.getHeight();
+                        const footerBaseline = pageHeight - 10;
+                        const sigY = footerBaseline - 28;
+                        // Receiver signature label only (no line)
+                        // Supplier signature (right)
+                        const sigW = 40, sigH = 20;
+                        const xRight = 140;
+                        if (company && company.signature) {
+                            try {
+                                doc.addImage(company.signature, 'PNG', xRight, sigY - sigH, sigW, sigH);
+                            } catch (e) {
+                                doc.line(xRight, sigY, xRight + sigW, sigY);
+                            }
+                        } else {
+                            doc.line(xRight, sigY, xRight + sigW, sigY);
+                        }
+                        // Labels just above footer
+                        doc.setFontSize(10);
+                        doc.text("Receiver's Signature", 14, sigY + 12);
+                        doc.text("Supplier's Signature", xRight + sigW / 2, sigY + 12, { align: 'center' });
+                        // Footer on all pages
+                        for (let i = 1; i <= pageCount; i++) {
+                            doc.setPage(i);
+                            try { doc.setFont('helvetica', 'italic'); } catch (e1) { try { doc.setFont(undefined, 'italic'); } catch (e2) {} }
+                            doc.setFontSize(9);
+                            doc.setTextColor(120);
+                            const pw = doc.internal.pageSize.getWidth();
+                            const ph = doc.internal.pageSize.getHeight();
+                            doc.text(footerText, pw / 2, ph - 10, { align: 'center' });
+                        }
+                    } catch (e) {}
+                }
+                else if (exportType === 'invoice' || exportType === 'tax-invoice') {
+                    try {
+                        const footerText = exportType === 'invoice' ? 'This is a Computer Generated Invoice' : 'This is a Computer Generated Tax Invoice';
+                        const pageCount = typeof doc.getNumberOfPages === 'function' ? doc.getNumberOfPages() : doc.internal.getNumberOfPages();
+                        for (let i = 1; i <= pageCount; i++) {
+                            doc.setPage(i);
+                            try { doc.setFont('helvetica', 'italic'); } catch (e1) { try { doc.setFont(undefined, 'italic'); } catch (e2) {} }
+                            doc.setFontSize(9);
+                            doc.setTextColor(120);
+                            const pageWidth = doc.internal.pageSize.getWidth();
+                            const pageHeight = doc.internal.pageSize.getHeight();
+                            doc.text(footerText, pageWidth / 2, pageHeight - 10, { align: 'center' });
+                        }
+                    } catch (e) {}
+                }
+                doc.save(fileName);
+                
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').classList.remove('active');
+                
+                // Show success message
+                showNotification('PDF generated successfully', 'success');
+            }
+
+            function generateInvoicePDF(invoiceId) {
+                generatePDFForType(invoiceId, 'invoice');
+            }
+
+            function generateTaxInvoicePDF(invoiceId) {
+                generatePDFForType(invoiceId, 'tax-invoice');
+            }
+
+            function generateDeliveryChallanPDF(invoiceId) {
+                generatePDFForType(invoiceId, 'delivery-challan');
+            }
+            
+            // Function to open delete modal
+            function openDeleteModal(invoiceId) {
+                deleteInvoiceId = invoiceId;
+                
+                // Show modal
+                const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                deleteModal.show();
+            }
+            
+            // Function to delete invoice
+            function deleteInvoice(invoiceId) {
+                // Show loading overlay
+                document.getElementById('loadingOverlay').classList.add('active');
+                
+                // Find invoice index
+                const index = invoices.findIndex(i => i.id === invoiceId);
+                if (index !== -1) {
+                    // Remove invoice
+                    invoices.splice(index, 1);
+                    
+                    // Save to local storage
+                    localforage.setItem('invoices', invoices)
+                        .then(function() {
+                            // Update filtered invoices
+                            filteredInvoices = [...invoices];
+                            
+                            // Render invoices table
+                            renderInvoicesTable();
+                            
+                            // Hide modal
+                            const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                            deleteModal.hide();
+                            
+                            // Hide loading overlay
+                            document.getElementById('loadingOverlay').classList.remove('active');
+                            
+                            // Show success message
+                            showNotification('Invoice deleted successfully', 'success');
+                        })
+                        .catch(function(err) {
+                            console.error('Error deleting invoice:', err);
+                            
+                            // Hide loading overlay
+                            document.getElementById('loadingOverlay').classList.remove('active');
+                            
+                            // Show error message
+                            showNotification('Error deleting invoice', 'danger');
+                        });
+                }
+            }
+            
+            // Function to export invoices
+            function exportInvoices() {
+                // Show loading overlay
+                document.getElementById('loadingOverlay').classList.add('active');
+                
+                // Create a new jsPDF instance
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add title
+                doc.setFontSize(18);
+                doc.text('Invoice List', 14, 22);
+                
+                // Add date
+                doc.setFontSize(11);
+                doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+                
+                // Prepare table data
+                const tableData = filteredInvoices.map(function(invoice) {
+                    const customer = customers.find(c => c.id === invoice.customerId);
+                    const customerName = customer ? customer.name : 'Unknown';
+                    
+                    return [
+                        invoice.number,
+                        formatDate(invoice.date),
+                        customerName,
+                        `₹${parseFloat(invoice.total).toFixed(2)}`,
+                        invoice.status
+                    ];
+                });
+                
+                // Add table
+                doc.autoTable({
+                    head: [['Invoice No.', 'Date', 'Customer', 'Amount', 'Status']],
+                    body: tableData,
+                    startY: 40,
+                    theme: 'striped',
+                    headStyles: {
+                        fillColor: [74, 108, 247]
+                    }
+                });
+                
+                // Save PDF
+                doc.save('invoices.pdf');
+                
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').classList.remove('active');
+                
+                // Show success message
+                showNotification('Invoices exported successfully', 'success');
+            }
+            
+            // Function to generate a unique ID
+            function generateId() {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2);
+            }
+            
+            // Function to format date
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            }
+
+            // Helper: convert phrase to Title Case (words separated by spaces, first letter capitalized)
+            function toTitleCase(phrase) {
+                const words = String(phrase).match(/[A-Za-z0-9]+/g) || [];
+                return words.map(function(w) { return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }).join(' ');
+            }
+            
+            // Function to show notification
+            function showNotification(message, type) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                notification.style.top = '20px';
+                notification.style.right = '20px';
+                notification.style.zIndex = '9999';
+                notification.style.minWidth = '300px';
+                notification.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                
+                // Add to body
+                document.body.appendChild(notification);
+                
+                // Auto dismiss after 5 seconds
+                setTimeout(function() {
+                    if (notification.parentNode) {
+                        const bsAlert = new bootstrap.Alert(notification);
+                        bsAlert.close();
+                    }
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>

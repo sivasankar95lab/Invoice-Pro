@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Pro - Dashboard</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="asset/favicon239x250.png">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --secondary-color: #f5f7ff;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --text-color: #334155;
+            --border-color: #e2e8f0;
+            --sidebar-width: 280px;
+        }
+        
+        body {
+            background-color: var(--secondary-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background-color: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .sidebar-logo {
+            max-width: 200px;
+            height: auto;
+        }
+        
+        .sidebar-nav {
+            padding: 1.5rem 0;
+        }
+        
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+        }
+        
+        .nav-link.active {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .nav-link i {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 0;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            color: #64748b;
+        }
+        
+        /* Stats Cards */
+        .stats-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stats-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .stats-icon.primary {
+            background-color: rgba(74, 108, 247, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .stats-icon.success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+        
+        .stats-icon.warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+        
+        .stats-icon.danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+        }
+        
+        .stats-value {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stats-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        /* Quick Actions */
+        .quick-action-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-color);
+            display: block;
+        }
+        
+        .quick-action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .quick-action-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        /* Chart Container */
+        .chart-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            height: 300px;
+        }
+        
+        /* Company Logo */
+        .company-logo {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            max-width: 120px;
+            height: auto;
+            opacity: 0.7;
+            z-index: 100;
+        }
+        
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background-color: white;
+            border-radius: 8px;
+            padding: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="bi bi-list fs-4"></i>
+    </button>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="asset/applogo345x150.png" alt="Invoice Pro" class="sidebar-logo">
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="dashboard.html" class="nav-link active">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="company.html" class="nav-link">
+                    <i class="bi bi-building"></i>
+                    <span>Company</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="customer.html" class="nav-link">
+                    <i class="bi bi-people"></i>
+                    <span>Customers</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="quotation.html" class="nav-link">
+                    <i class="bi bi-file-text"></i>
+                    <span>Quotations</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="invoice.html" class="nav-link">
+                    <i class="bi bi-receipt"></i>
+                    <span>Invoices</span>
+                </a>
+            </div>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="nav-item">
+                <div class="nav-link d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-wifi"></i> Online Status</span>
+                    <span id="onlineIndicator" class="badge rounded-pill bg-secondary">Checking...</span>
+                </div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-link d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-cloud"></i> Remote DB</span>
+                    <span id="remoteDbIndicator" class="badge rounded-pill bg-secondary">Checking...</span>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link" id="refreshBtn">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>Refresh</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="index.html" class="nav-link" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Welcome back! Here's an overview of your business.</p>
+            </div>
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-primary me-2" id="exportDbBtn">
+                    <i class="bi bi-download me-1"></i>Export DB
+                </button>
+                <button class="btn btn-outline-secondary" id="importDbBtn">
+                    <i class="bi bi-upload me-1"></i>Import DB
+                </button>
+                <input type="file" id="importDbInput" accept="application/json" style="display:none">
+            </div>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div class="row">
+            <div class="col-md-6 col-lg-4 col-xl-2">
+                <div class="stats-card">
+                    <div class="stats-icon primary">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <div class="stats-value" id="totalCompanies">0</div>
+                    <div class="stats-label">Total Companies</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 col-xl-2">
+                <div class="stats-card">
+                    <div class="stats-icon success">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="stats-value" id="totalCustomers">0</div>
+                    <div class="stats-label">Total Customers</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 col-xl-2">
+                <div class="stats-card">
+                    <div class="stats-icon warning">
+                        <i class="bi bi-receipt"></i>
+                    </div>
+                    <div class="stats-value" id="totalInvoices">0</div>
+                    <div class="stats-label">Total Invoices</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 col-xl-2">
+                <div class="stats-card">
+                    <div class="stats-icon danger">
+                        <i class="bi bi-file-text"></i>
+                    </div>
+                    <div class="stats-value" id="totalQuotes">0</div>
+                    <div class="stats-label">Total Quotes</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 col-xl-4">
+                <div class="stats-card">
+                    <div class="stats-icon primary">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                    <div class="stats-value" id="monthlyRevenue">$0</div>
+                    <div class="stats-label">Monthly Revenue</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="h5 mb-3">Quick Actions</h2>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <a href="#" class="quick-action-card" id="createCompanyBtn">
+                    <div class="quick-action-icon">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <h5>Create Company</h5>
+                </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <a href="#" class="quick-action-card" id="createCustomerBtn">
+                    <div class="quick-action-icon">
+                        <i class="bi bi-person-plus"></i>
+                    </div>
+                    <h5>Create Customer</h5>
+                </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <a href="#" class="quick-action-card" id="createQuotationBtn">
+                    <div class="quick-action-icon">
+                        <i class="bi bi-file-plus"></i>
+                    </div>
+                    <h5>Create Quotation</h5>
+                </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <a href="#" class="quick-action-card" id="createInvoiceBtn">
+                    <div class="quick-action-icon">
+                        <i class="bi bi-receipt-cutoff"></i>
+                    </div>
+                    <h5>Create Invoice</h5>
+                </a>
+            </div>
+        </div>
+        
+        
+    </div>
+    
+    <!-- Company Logo -->
+    <img src="asset/slablogo.png" alt="Company Logo" class="company-logo">
+    <input type="file" id="importDbInput" accept="application/json" style="display:none">
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- LocalForage -->
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <!-- Chart.js -->
+    <!-- CHANGED LINE: Using a specific version of Chart.js to prevent source map warning -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Supabase integration: remote store with local fallback and sync
+            (function(){
+                const SUPABASE_URL = 'https://nnazbmwzqvzzuyecvlik.supabase.co';
+                const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uYXpibXd6cXZ6enV5ZWN2bGlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MzAwNzksImV4cCI6MjA3OTIwNjA3OX0.ENU4UT-QnWL2G1D3Lvpq-YLDgnorqJaeEgChirwaV28';
+                const remoteTables = ['companies','customers','invoices','quotations'];
+                const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+                async function verifyRemoteSetup(){
+                    if (!sb) return;
+                    if (localStorage.getItem('supabase_setup_shown')==='1') return;
+                    try {
+                        const { data, error } = await sb.from('app_store').select('key').limit(1);
+                        if (error) {
+                            showSupabaseSetupModal(error.message || 'Remote not accessible');
+                            localStorage.setItem('supabase_setup_shown','1');
+                        }
+                    } catch (err) {
+                        showSupabaseSetupModal(err && err.message ? err.message : 'Remote not accessible');
+                        localStorage.setItem('supabase_setup_shown','1');
+                    }
+                }
+                function showSupabaseSetupModal(reason){
+                    if (!document.getElementById('supabaseSetupModal')){
+                        const div = document.createElement('div');
+                        div.innerHTML = (
+                            '<div class="modal fade" id="supabaseSetupModal" tabindex="-1" aria-hidden="true">'
+                            + '<div class="modal-dialog modal-lg modal-dialog-scrollable">'
+                            + '<div class="modal-content">'
+                            + '<div class="modal-header">'
+                            + '<h5 class="modal-title">Supabase Setup Required</h5>'
+                            + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'
+                            + '</div>'
+                            + '<div class="modal-body">'
+                            + '<p>Remote database is not ready. Reason: ' + String(reason) + '</p>'
+                            + '<p>Steps to configure your Supabase project:</p>'
+                            + '<ol>'
+                            + '<li>Open SQL editor in Supabase.</li>'
+                            + '<li>Create the table in the public schema:</li>'
+                            + '</ol>'
+                            + '<pre><code>create table if not exists public.app_store (\n  key text primary key,\n  value jsonb not null\n);\nalter table public.app_store enable row level security;\ncreate policy "Allow read to anon" on public.app_store for select using (true);\ncreate policy "Allow insert to anon" on public.app_store for insert with check (true);\ncreate policy "Allow update to anon" on public.app_store for update using (true) with check (true);\ncreate policy "Allow delete to anon" on public.app_store for delete using (true);\n</code></pre>'
+                            + '<p>Ensure the anon public key is enabled for your project and the policies allow reads and writes.</p>'
+                            + '</div>'
+                            + '<div class="modal-footer">'
+                            + '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                        );
+                        document.body.appendChild(div);
+                    }
+                    const modalEl = document.getElementById('supabaseSetupModal');
+                    if (window.bootstrap && window.bootstrap.Modal) {
+                        const modal = new window.bootstrap.Modal(modalEl);
+                        modal.show();
+                    } else {
+                        modalEl.style.display = 'block';
+                    }
+                }
+                async function remoteGet(key){
+                    try {
+                        if (!sb || remoteTables.indexOf(key) === -1) return null;
+                        const { data, error } = await sb.from('app_store').select('value').eq('key', key);
+                        if (error) return null;
+                        return Array.isArray(data) && data.length ? data[0].value : null;
+                    } catch(_) { return null; }
+                }
+                async function remoteUpsert(key, value){
+                    try {
+                        if (!sb || remoteTables.indexOf(key) === -1) return;
+                        await sb.from('app_store').upsert({ key, value }, { onConflict: 'key' });
+                    } catch(_) {}
+                }
+                const originalGetItem = localforage.getItem.bind(localforage);
+                const originalSetItem = localforage.setItem.bind(localforage);
+                localforage.getItem = async function(key){
+                    const remote = await remoteGet(key);
+                    if (remote !== null && remote !== undefined) {
+                        await originalSetItem(key, remote);
+                        return remote;
+                    }
+                    return originalGetItem(key);
+                };
+                localforage.setItem = async function(key, value){
+                    await remoteUpsert(key, value);
+                    return originalSetItem(key, value);
+                };
+                (async function syncStore(){
+                    try {
+                        const keys = await localforage.keys();
+                        for (const k of keys) {
+                            const v = await originalGetItem(k);
+                            await remoteUpsert(k, v);
+                        }
+                        for (const k of remoteTables) {
+                            const rv = await remoteGet(k);
+                            if (rv) await originalSetItem(k, rv);
+                        }
+                    } catch(_) {}
+                })();
+                verifyRemoteSetup();
+
+                function updateOnlineIndicator(){
+                    const el = document.getElementById('onlineIndicator');
+                    if (!el) return;
+                    const online = navigator.onLine;
+                    el.textContent = online ? 'Online' : 'Offline';
+                    el.classList.remove('bg-secondary','bg-success','bg-danger');
+                    el.classList.add(online ? 'bg-success' : 'bg-danger');
+                }
+                async function updateRemoteDbIndicator(){
+                    const el = document.getElementById('remoteDbIndicator');
+                    if (!el) return;
+                    try {
+                        if (!sb) { el.textContent = 'Offline'; el.classList.remove('bg-secondary','bg-success','bg-danger'); el.classList.add('bg-danger'); return; }
+                        const { error } = await sb.from('app_store').select('key').limit(1);
+                        const ok = !error;
+                        el.textContent = ok ? 'Online' : 'Offline';
+                        el.classList.remove('bg-secondary','bg-success','bg-danger');
+                        el.classList.add(ok ? 'bg-success' : 'bg-danger');
+                    } catch(_) {
+                        el.textContent = 'Offline';
+                        el.classList.remove('bg-secondary','bg-success','bg-danger');
+                        el.classList.add('bg-danger');
+                    }
+                }
+                updateOnlineIndicator();
+                updateRemoteDbIndicator();
+                window.addEventListener('online', updateOnlineIndicator);
+                window.addEventListener('offline', updateOnlineIndicator);
+                setInterval(updateRemoteDbIndicator, 60000);
+            })();
+            // Initialize localForage
+            localforage.config({
+                name: 'InvoiceProDB',
+                storeName: 'data'
+            });
+            
+            
+            
+            // Load dashboard data
+            loadDashboardData();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            
+            
+            // Function to load dashboard data
+            function loadDashboardData() {
+                // Load data from local storage or set default values
+                localforage.getItem('companies')
+                    .then(function(companies) {
+                        const companiesCount = companies ? companies.length : 0;
+                        document.getElementById('totalCompanies').textContent = companiesCount;
+                    })
+                    .catch(function(err) {
+                        console.error('Error loading companies:', err);
+                        document.getElementById('totalCompanies').textContent = '0';
+                    });
+                
+                localforage.getItem('customers')
+                    .then(function(customers) {
+                        const customersCount = customers ? customers.length : 0;
+                        document.getElementById('totalCustomers').textContent = customersCount;
+                    })
+                    .catch(function(err) {
+                        console.error('Error loading customers:', err);
+                        document.getElementById('totalCustomers').textContent = '0';
+                    });
+                
+                localforage.getItem('invoices')
+                    .then(function(invoices) {
+                        const invoicesCount = invoices ? invoices.length : 0;
+                        document.getElementById('totalInvoices').textContent = invoicesCount;
+                        
+                        // Calculate monthly revenue
+                        let monthlyRevenue = 0;
+                        if (invoices) {
+                            const currentMonth = new Date().getMonth();
+                            const currentYear = new Date().getFullYear();
+                            
+                            invoices.forEach(function(invoice) {
+                                const invoiceDate = new Date(invoice.date);
+                                if (invoiceDate.getMonth() === currentMonth && invoiceDate.getFullYear() === currentYear) {
+                                    monthlyRevenue += parseFloat(invoice.total) || 0;
+                                }
+                            });
+                        }
+                        
+                        document.getElementById('monthlyRevenue').textContent = '₹' + monthlyRevenue.toFixed(2);
+                        
+                        
+                    })
+                    .catch(function(err) {
+                        console.error('Error loading invoices:', err);
+                        document.getElementById('totalInvoices').textContent = '0';
+                        document.getElementById('monthlyRevenue').textContent = '$0';
+                    });
+                
+                localforage.getItem('quotations')
+                    .then(function(quotations) {
+                        const totalQuotes = quotations ? quotations.length : 0;
+                        document.getElementById('totalQuotes').textContent = totalQuotes;
+                    })
+                    .catch(function(err) {
+                        console.error('Error loading quotations:', err);
+                        document.getElementById('totalQuotes').textContent = '0';
+                    });
+                
+                
+            }
+            
+            
+            
+            // Function to setup event listeners
+            function setupEventListeners() {
+                // Mobile menu toggle
+                document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+                    document.getElementById('sidebar').classList.toggle('active');
+                });
+                
+                // Logout button - now simply redirects to login page
+                document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = 'index.html';
+                });
+                
+                // Refresh button
+                document.getElementById('refreshBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    loadDashboardData();
+                });
+                
+                // Quick action buttons
+                document.getElementById('createCompanyBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Navigate to company page with create mode
+                    window.location.href = 'company.html?action=create';
+                });
+                
+                document.getElementById('createCustomerBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Navigate to customer page with create mode
+                    window.location.href = 'customer.html?action=create';
+                });
+                
+                document.getElementById('createQuotationBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Navigate to quotation page with create mode
+                    window.location.href = 'quotation.html?action=create';
+                });
+                
+                document.getElementById('createInvoiceBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Navigate to invoice page with create mode
+                    window.location.href = 'invoice.html?action=create';
+                });
+
+                const exportBtn = document.getElementById('exportDbBtn');
+                const importBtn = document.getElementById('importDbBtn');
+                const importInput = document.getElementById('importDbInput');
+                if (exportBtn) {
+                    exportBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        exportDatabase();
+                    });
+                }
+                if (importBtn && importInput) {
+                    importBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        importInput.click();
+                    });
+                    importInput.addEventListener('change', function() {
+                        if (this.files && this.files[0]) {
+                            importDatabaseFromFile(this.files[0]);
+                            this.value = '';
+                        }
+                    });
+                }
+            }
+
+            async function exportDatabase() {
+                try {
+                    const keys = await localforage.keys();
+                    const store = {};
+                    for (const k of keys) {
+                        store[k] = await localforage.getItem(k);
+                    }
+                    const payload = { meta: { exportedAt: new Date().toISOString() }, store };
+                    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'invoice_pro_db_export.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    URL.revokeObjectURL(url);
+                } catch (err) {
+                    console.error('Error exporting database:', err);
+                }
+            }
+
+            function importDatabaseFromFile(file) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    try {
+                        const json = JSON.parse(e.target.result);
+                        const store = json && json.store ? json.store : json;
+                        if (!store || typeof store !== 'object') return;
+                        const keys = Object.keys(store);
+                        for (const k of keys) {
+                            await localforage.setItem(k, store[k]);
+                        }
+                        loadDashboardData();
+                        alert('Database imported successfully');
+                    } catch (err) {
+                        console.error('Error importing database:', err);
+                        alert('Failed to import database');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+    </script>
+</body>
+</html>

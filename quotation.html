@@ -1,0 +1,2480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Pro - Quotation Management</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="asset/favicon239x250.png">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --secondary-color: #f5f7ff;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --text-color: #334155;
+            --border-color: #e2e8f0;
+            --sidebar-width: 280px;
+        }
+        
+        body {
+            background-color: var(--secondary-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background-color: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .sidebar-logo {
+            max-width: 200px;
+            height: auto;
+        }
+        
+        .sidebar-nav {
+            padding: 1.5rem 0;
+        }
+        
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+        }
+        
+        .nav-link.active {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .nav-link i {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 0;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            color: #64748b;
+        }
+        
+        /* Table Styles */
+        .table-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th {
+            background-color: var(--secondary-color);
+            font-weight: 600;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--border-color);
+            padding: 0.75rem;
+            text-align: left;
+        }
+        
+        .table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(74, 108, 247, 0.05);
+        }
+        
+        /* Search and Filter Styles */
+        .search-filter-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-control, .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+            outline: none;
+        }
+        
+        /* Button Styles */
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a5bd9;
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Company Logo */
+        .company-logo {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            max-width: 120px;
+            height: auto;
+            opacity: 0.7;
+            z-index: 100;
+        }
+        
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background-color: white;
+            border-radius: 8px;
+            padding: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Modal Styles */
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+        
+        .modal-title {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+        
+        /* Form Section Styles */
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .form-section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-section-title i {
+            font-size: 1.25rem;
+        }
+        
+        /* Badge Styles */
+        .badge {
+            padding: 0.375rem 0.75rem;
+            font-weight: 500;
+        }
+        
+        /* Item Table Styles */
+        .item-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .item-table th, .item-table td {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .item-table th {
+            background-color: var(--secondary-color);
+            font-weight: 600;
+        }
+        
+        .item-input {
+            width: 100%;
+            border: none;
+            padding: 0.25rem;
+            background-color: transparent;
+        }
+        
+        .item-input:focus {
+            outline: none;
+            background-color: rgba(74, 108, 247, 0.05);
+        }
+        
+        /* Quotation Preview Styles */
+        .quotation-preview {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .quotation-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .quotation-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .quotation-details {
+            margin-bottom: 1rem;
+        }
+        
+        .quotation-details-row {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+        
+        .quotation-details-label {
+            font-weight: 600;
+            width: 120px;
+        }
+        
+        .quotation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        
+        .quotation-table th, .quotation-table td {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            text-align: left;
+        }
+        
+        .quotation-table th {
+            background-color: var(--secondary-color);
+        }
+        
+        .quotation-summary {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+        
+        .quotation-summary-table {
+            width: 300px;
+            border-collapse: collapse;
+        }
+        
+        .quotation-summary-table td {
+            padding: 0.25rem 0.5rem;
+            text-align: right;
+        }
+        
+        .quotation-summary-table td:first-child {
+            text-align: left;
+        }
+        
+        /* Preview Modal Styles */
+        .preview-modal .modal-dialog {
+            max-width: 900px;
+        }
+        
+        .preview-content {
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+        
+        /* Loading overlay styles */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-spinner-large {
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.3rem;
+        }
+        
+        .loading-text {
+            margin-top: 1rem;
+            color: var(--text-color);
+            font-size: 1.1rem;
+        }
+        
+        /* Empty State Styles */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+        
+        .empty-state-text {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="bi bi-list fs-4"></i>
+    </button>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="asset/applogo345x150.png" alt="Invoice Pro" class="sidebar-logo">
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="company.html" class="nav-link">
+                    <i class="bi bi-building"></i>
+                    <span>Company</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="customer.html" class="nav-link">
+                    <i class="bi bi-people"></i>
+                    <span>Customers</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="quotation.html" class="nav-link active">
+                    <i class="bi bi-file-text"></i>
+                    <span>Quotations</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="invoice.html" class="nav-link">
+                    <i class="bi bi-receipt"></i>
+                    <span>Invoices</span>
+                </a>
+            </div>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="nav-item">
+                <div class="nav-link d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-wifi"></i> Online Status</span>
+                    <span id="onlineIndicator" class="badge rounded-pill bg-secondary">Checking...</span>
+                </div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-link d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-cloud"></i> Remote DB</span>
+                    <span id="remoteDbIndicator" class="badge rounded-pill bg-secondary">Checking...</span>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link" id="refreshBtn">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>Refresh</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="index.html" class="nav-link" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Quotation Management</h1>
+                <p class="page-subtitle">Create and manage your quotations</p>
+            </div>
+            <div>
+                <button class="btn btn-outline-primary me-2" id="exportBtn">
+                    <i class="bi bi-download me-2"></i>Export
+                </button>
+                <button class="btn btn-primary" id="addQuotationBtn">
+                    <i class="bi bi-plus-circle me-2"></i>Create Quotation
+                </button>
+            </div>
+        </div>
+        
+        <!-- Search and Filter -->
+        <div class="search-filter-container">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search by number, customer, status...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="draft">Draft</option>
+                        <option value="sent">Sent</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="converted">Converted</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="dateFilter">
+                        <option value="">All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-outline-primary w-100" id="clearFilterBtn">
+                        <i class="bi bi-x-circle me-2"></i>Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quotations Table -->
+        <div class="table-container">
+            <div id="quotationsTableContainer">
+                <!-- Table will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Company Logo -->
+    <img src="asset/slablogo.png" alt="Company Logo" class="company-logo">
+    
+    <!-- Quotation Modal -->
+    <div class="modal fade" id="quotationModal" tabindex="-1" aria-labelledby="quotationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="quotationModalLabel">Create Quotation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="quotationForm">
+                        <input type="hidden" id="quotationId">
+                        
+                        <!-- Quotation Details Section -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">
+                                <i class="bi bi-file-text"></i>
+                                Quotation Details
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="quotationNumber" class="form-label">Quotation Number</label>
+                                    <input type="text" class="form-control" id="quotationNumber" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="quotationDate" class="form-label">Date</label>
+                                    <input type="date" class="form-control" id="quotationDate" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="validUntil" class="form-label">Valid Until</label>
+                                    <input type="date" class="form-control" id="validUntil" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="quotationStatus" class="form-label">Status</label>
+                                    <select class="form-select" id="quotationStatus">
+                                        <option value="draft">Draft</option>
+                                        <option value="sent">Sent</option>
+                                        <option value="accepted">Accepted</option>
+                                        <option value="rejected">Rejected</option>
+                                        <option value="converted">Converted</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Company and Customer Section -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">
+                                <i class="bi bi-building"></i>
+                                Company and Customer
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="companySelect" class="form-label">Company</label>
+                                    <select class="form-select" id="companySelect" required>
+                                        <option value="">Select Company</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="customerSelect" class="form-label">Customer</label>
+                                    <select class="form-select" id="customerSelect" required>
+                                        <option value="">Select Customer</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Items Section -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">
+                                <i class="bi bi-list"></i>
+                                Items
+                            </h6>
+                            <div class="table-responsive">
+                                <table class="item-table" id="itemsTable">
+                                    <thead>
+                                        <tr>
+                                            <th width="5%">#</th>
+                                            <th width="40%">Description</th>
+                                            <th width="10%">Qty</th>
+                                            <th width="15%">Unit Price (₹)</th>
+                                            <th width="15%">Amount (₹)</th>
+                                            <th width="5%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="itemsTableBody">
+                                        <!-- Items will be added dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary mt-2" id="addItemBtn">
+                                <i class="bi bi-plus-circle me-2"></i>Add Item
+                            </button>
+                        </div>
+                        
+                        <!-- Discount Section -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">
+                                <i class="bi bi-percent"></i>
+                                Discount
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="discountType" class="form-label">Discount Type</label>
+                                    <select class="form-select" id="discountType">
+                                        <option value="">No Discount</option>
+                                        <option value="percentage">Percentage</option>
+                                        <option value="fixed">Fixed Amount</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="discountValue" class="form-label">Discount Value (₹)</label>
+                                    <input type="number" class="form-control" id="discountValue" min="0" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Terms and Conditions Section -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">
+                                <i class="bi bi-file-text"></i>
+                                Terms and Conditions
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="termsConditions" class="form-label">Terms and Conditions</label>
+                                    <textarea class="form-control" id="termsConditions" rows="4"></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <label for="notes" class="form-label">Notes</label>
+                                    <textarea class="form-control" id="notes" rows="2"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Summary Section -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">
+                                <i class="bi bi-calculator"></i>
+                                Summary
+                            </h6>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="quotation-preview" id="quotationPreview">
+                                        <!-- Quotation preview will be generated here -->
+                                    </div>
+                                </div>
+                                <div class="col-12 d-none">
+                                    <div>
+                                        <table>
+                                            <tr>
+                                                <td>Subtotal:</td>
+                                                <td id="subtotalDisplay">₹0.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Discount:</td>
+                                                <td id="discountDisplay">₹0.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Total:</strong></td>
+                                                <td id="totalDisplay"><strong>₹0.00</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Amount in Words:</td>
+                                                <td id="amountInWords">Zero</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                             </div>
+                         </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveQuotationBtn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Preview Modal -->
+    <div class="modal fade preview-modal" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewModalLabel">Quotation Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="preview-content" id="previewContent">
+                        <!-- Preview content will be generated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this quotation? This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Convert to Invoice Modal -->
+    <div class="modal fade" id="convertModal" tabindex="-1" aria-labelledby="convertModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="convertModalLabel">Convert to Invoice</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to convert this quotation to an invoice?</p>
+                    <div class="mb-3">
+                        <label for="invoiceDate" class="form-label">Invoice Date</label>
+                        <input type="date" class="form-control" id="invoiceDate">
+                    </div>
+                    <div class="mb-3">
+                        <label for="dueDate" class="form-label">Due Date</label>
+                        <input type="date" class="form-control" id="dueDate">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmConvertBtn">Convert</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border text-primary loading-spinner-large" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="loading-text">Loading...</div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- LocalForage -->
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- jsPDF AutoTable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <!-- Number to Words -->
+    <script src="https://cdn.jsdelivr.net/npm/number-to-words@1.2.1/numberToWords.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize localForage
+            localforage.config({
+                name: 'InvoiceProDB',
+                storeName: 'data'
+            });
+            (function(){
+                const SUPABASE_URL = 'https://nnazbmwzqvzzuyecvlik.supabase.co';
+                const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uYXpibXd6cXZ6enV5ZWN2bGlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MzAwNzksImV4cCI6MjA3OTIwNjA3OX0.ENU4UT-QnWL2G1D3Lvpq-YLDgnorqJaeEgChirwaV28';
+                const remoteTables = ['companies','customers','invoices','quotations'];
+                const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+                async function verifyRemoteSetup(){
+                    if (!sb) return;
+                    if (localStorage.getItem('supabase_setup_shown')==='1') return;
+                    try {
+                        const { data, error } = await sb.from('app_store').select('key').limit(1);
+                        if (error) {
+                            showSupabaseSetupModal(error.message || 'Remote not accessible');
+                            localStorage.setItem('supabase_setup_shown','1');
+                        }
+                    } catch (err) {
+                        showSupabaseSetupModal(err && err.message ? err.message : 'Remote not accessible');
+                        localStorage.setItem('supabase_setup_shown','1');
+                    }
+                }
+                function showSupabaseSetupModal(reason){
+                    if (!document.getElementById('supabaseSetupModal')){
+                        const div = document.createElement('div');
+                        div.innerHTML = (
+                            '<div class="modal fade" id="supabaseSetupModal" tabindex="-1" aria-hidden="true">'
+                            + '<div class="modal-dialog modal-lg modal-dialog-scrollable">'
+                            + '<div class="modal-content">'
+                            + '<div class="modal-header">'
+                            + '<h5 class="modal-title">Supabase Setup Required</h5>'
+                            + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'
+                            + '</div>'
+                            + '<div class="modal-body">'
+                            + '<p>Remote database is not ready. Reason: ' + String(reason) + '</p>'
+                            + '<p>Steps to configure your Supabase project:</p>'
+                            + '<ol>'
+                            + '<li>Open SQL editor in Supabase.</li>'
+                            + '<li>Create the table in the public schema:</li>'
+                            + '</ol>'
+                            + '<pre><code>create table if not exists public.app_store (\n  key text primary key,\n  value jsonb not null\n);\nalter table public.app_store enable row level security;\ncreate policy "Allow read to anon" on public.app_store for select using (true);\ncreate policy "Allow insert to anon" on public.app_store for insert with check (true);\ncreate policy "Allow update to anon" on public.app_store for update using (true) with check (true);\ncreate policy "Allow delete to anon" on public.app_store for delete using (true);\n</code></pre>'
+                            + '<p>Ensure the anon public key is enabled for your project and the policies allow reads and writes.</p>'
+                            + '</div>'
+                            + '<div class="modal-footer">'
+                            + '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                        );
+                        document.body.appendChild(div);
+                    }
+                    const modalEl = document.getElementById('supabaseSetupModal');
+                    if (window.bootstrap && window.bootstrap.Modal) {
+                        const modal = new window.bootstrap.Modal(modalEl);
+                        modal.show();
+                    } else {
+                        modalEl.style.display = 'block';
+                    }
+                }
+                async function remoteGet(key){ try { if (!sb || remoteTables.indexOf(key)===-1) return null; const { data, error } = await sb.from('app_store').select('value').eq('key', key); if (error) return null; return Array.isArray(data)&&data.length?data[0].value:null; } catch(_) { return null; } }
+                async function remoteUpsert(key,value){ try { if (!sb || remoteTables.indexOf(key)===-1) return; await sb.from('app_store').upsert({ key, value }, { onConflict: 'key' }); } catch(_) {} }
+                const originalGetItem = localforage.getItem.bind(localforage);
+                const originalSetItem = localforage.setItem.bind(localforage);
+                localforage.getItem = async function(key){ const remote = await remoteGet(key); if (remote!==null && remote!==undefined){ await originalSetItem(key, remote); return remote; } return originalGetItem(key); };
+                localforage.setItem = async function(key,value){ await remoteUpsert(key,value); return originalSetItem(key,value); };
+                verifyRemoteSetup();
+                function updateOnlineIndicator(){
+                    const el = document.getElementById('onlineIndicator');
+                    if (!el) return;
+                    const online = navigator.onLine;
+                    el.textContent = online ? 'Online' : 'Offline';
+                    el.classList.remove('bg-secondary','bg-success','bg-danger');
+                    el.classList.add(online ? 'bg-success' : 'bg-danger');
+                }
+                async function updateRemoteDbIndicator(){
+                    const el = document.getElementById('remoteDbIndicator');
+                    if (!el) return;
+                    try {
+                        if (!sb) { el.textContent = 'Offline'; el.classList.remove('bg-secondary','bg-success','bg-danger'); el.classList.add('bg-danger'); return; }
+                        const { error } = await sb.from('app_store').select('key').limit(1);
+                        const ok = !error;
+                        el.textContent = ok ? 'Online' : 'Offline';
+                        el.classList.remove('bg-secondary','bg-success','bg-danger');
+                        el.classList.add(ok ? 'bg-success' : 'bg-danger');
+                    } catch(_) {
+                        el.textContent = 'Offline';
+                        el.classList.remove('bg-secondary','bg-success','bg-danger');
+                        el.classList.add('bg-danger');
+                    }
+                }
+                updateOnlineIndicator();
+                updateRemoteDbIndicator();
+                window.addEventListener('online', updateOnlineIndicator);
+                window.addEventListener('offline', updateOnlineIndicator);
+                setInterval(updateRemoteDbIndicator, 60000);
+            })();
+            
+            // Initialize variables
+            let quotations = [];
+            let filteredQuotations = [];
+            let currentQuotationId = null;
+            let deleteQuotationId = null;
+            let convertQuotationId = null;
+            let previewQuotationId = null;
+            let companies = [];
+            let customers = [];
+            let items = [];
+            
+            // Initialize page
+            init();
+            
+            // Function to initialize the page
+            function init() {
+                // Setup event listeners
+                setupEventListeners();
+                
+                // Load data
+                loadData();
+                
+                // Check for URL parameters
+                checkUrlParams();
+            }
+            
+            // Function to setup event listeners
+            function setupEventListeners() {
+                // Mobile menu toggle
+                document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+                    document.getElementById('sidebar').classList.toggle('active');
+                });
+                
+                // Logout button
+                document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = 'index.html';
+                });
+                
+                // Refresh button
+                document.getElementById('refreshBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    loadData();
+                });
+                
+                // Add quotation button
+                document.getElementById('addQuotationBtn').addEventListener('click', function() {
+                    openQuotationModal();
+                });
+                
+                // Save quotation button
+                document.getElementById('saveQuotationBtn').addEventListener('click', function() {
+                    saveQuotation();
+                });
+                
+                // Preview button removed (button was removed from modal)
+                
+                // Download PDF option removed from preview modal
+                
+                // Confirm delete button
+                document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                    deleteQuotation(deleteQuotationId);
+                });
+                
+                // Confirm convert button
+                document.getElementById('confirmConvertBtn').addEventListener('click', function() {
+                    convertToInvoice(convertQuotationId);
+                });
+                
+                // Export button
+                document.getElementById('exportBtn').addEventListener('click', function() {
+                    exportQuotations();
+                });
+                
+                // Search input
+                document.getElementById('searchInput').addEventListener('input', function() {
+                    filterQuotations();
+                });
+                
+                // Status filter
+                document.getElementById('statusFilter').addEventListener('change', function() {
+                    filterQuotations();
+                });
+                
+                // Date filter
+                document.getElementById('dateFilter').addEventListener('change', function() {
+                    filterQuotations();
+                });
+                
+                // Clear filter button
+                document.getElementById('clearFilterBtn').addEventListener('click', function() {
+                    document.getElementById('searchInput').value = '';
+                    document.getElementById('statusFilter').value = '';
+                    document.getElementById('dateFilter').value = '';
+                    filterQuotations();
+                });
+                
+                // Add item button
+                document.getElementById('addItemBtn').addEventListener('click', function() {
+                    addItem();
+                });
+                
+                // Discount type change
+                document.getElementById('discountType').addEventListener('change', function() {
+                    updateCalculations();
+                });
+                
+                // Discount value change
+                document.getElementById('discountValue').addEventListener('input', function() {
+                    updateCalculations();
+                });
+                
+                // Set today's date as default
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('quotationDate').value = today;
+                
+                // Set valid until date (30 days from today)
+                const validUntil = new Date();
+                validUntil.setDate(validUntil.getDate() + 30);
+                document.getElementById('validUntil').value = validUntil.toISOString().split('T')[0];
+            }
+            
+            // Function to check URL parameters
+            function checkUrlParams() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const action = urlParams.get('action');
+                
+                if (action === 'create') {
+                    // Open the quotation modal after a short delay to ensure the page is loaded
+                    setTimeout(function() {
+                        openQuotationModal();
+                    }, 500);
+                }
+            }
+            
+            // Function to load data
+            function loadData() {
+                // Show loading overlay
+                document.getElementById('loadingOverlay').classList.add('active');
+                
+                // Load companies
+                localforage.getItem('companies')
+                    .then(function(data) {
+                        companies = data || [];
+                        
+                        // Populate company select
+                        const companySelect = document.getElementById('companySelect');
+                        companySelect.innerHTML = '<option value="">Select Company</option>';
+                        
+                        companies.forEach(function(company) {
+                            const option = document.createElement('option');
+                            option.value = company.id;
+                            option.textContent = company.name;
+                            companySelect.appendChild(option);
+                        });
+                        
+                        // Load customers
+                        return localforage.getItem('customers');
+                    })
+                    .then(function(data) {
+                        customers = data || [];
+                        
+                        // Populate customer select
+                        const customerSelect = document.getElementById('customerSelect');
+                        customerSelect.innerHTML = '<option value="">Select Customer</option>';
+                        
+                        customers.forEach(function(customer) {
+                            const option = document.createElement('option');
+                            option.value = customer.id;
+                            option.textContent = customer.name;
+                            customerSelect.appendChild(option);
+                        });
+                        
+                        // Load quotations
+                        return localforage.getItem('quotations');
+                    })
+                    .then(function(data) {
+                        quotations = data || [];
+                        filteredQuotations = [...quotations];
+                        
+                        // Render quotations table
+                        renderQuotationsTable();
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                    })
+                    .catch(function(err) {
+                        console.error('Error loading data:', err);
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        
+                        // Show error message
+                        showNotification('Error loading data', 'danger');
+                    });
+            }
+            
+            // Function to render quotations table
+            function renderQuotationsTable() {
+                const container = document.getElementById('quotationsTableContainer');
+                
+                if (filteredQuotations.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-file-text"></i>
+                            </div>
+                            <h3 class="empty-state-title">No quotations found</h3>
+                            <p class="empty-state-text">Create your first quotation to get started</p>
+                            <button class="btn btn-primary" id="emptyStateAddBtn">
+                                <i class="bi bi-plus-circle me-2"></i>Create Quotation
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Add event listener to the empty state button
+                    document.getElementById('emptyStateAddBtn').addEventListener('click', function() {
+                        openQuotationModal();
+                    });
+                } else {
+                    let tableHTML = `
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Quotation No.</th>
+                                        <th>Date</th>
+                                        <th>Customer</th>
+                                        <th>Amount (₹)</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+                    
+                    filteredQuotations.forEach(function(quotation) {
+                        const customer = customers.find(c => c.id === quotation.customerId);
+                        const customerName = customer ? customer.name : 'Unknown';
+                        
+                        let statusBadge = '';
+                        switch(quotation.status) {
+                            case 'draft':
+                                statusBadge = '<span class="badge bg-secondary">Draft</span>';
+                                break;
+                            case 'sent':
+                                statusBadge = '<span class="badge bg-info">Sent</span>';
+                                break;
+                            case 'accepted':
+                                statusBadge = '<span class="badge bg-success">Accepted</span>';
+                                break;
+                            case 'rejected':
+                                statusBadge = '<span class="badge bg-danger">Rejected</span>';
+                                break;
+                            case 'converted':
+                                statusBadge = '<span class="badge bg-primary">Converted</span>';
+                                break;
+                            default:
+                                statusBadge = '<span class="badge bg-secondary">Unknown</span>';
+                        }
+                        
+                        tableHTML += `
+                            <tr>
+                                <td>${quotation.number}</td>
+                                <td>${formatDate(quotation.date)}</td>
+                                <td>${customerName}</td>
+                                <td>₹${parseFloat(quotation.total).toFixed(2)}</td>
+                                <td>${statusBadge}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-primary view-btn" data-id="${quotation.id}" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${quotation.id}" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-success pdf-btn" data-id="${quotation.id}" title="Download PDF">
+                                            <i class="bi bi-file-pdf"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-warning convert-btn" data-id="${quotation.id}" title="Convert to Invoice" ${quotation.status === 'converted' ? 'disabled' : ''}>
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${quotation.id}" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    
+                    tableHTML += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    
+                    container.innerHTML = tableHTML;
+                    
+                    // Add event listeners to action buttons
+                    document.querySelectorAll('.view-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const quotationId = this.getAttribute('data-id');
+                            openPreviewModal(quotationId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.edit-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const quotationId = this.getAttribute('data-id');
+                            openQuotationModal(quotationId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.pdf-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const quotationId = this.getAttribute('data-id');
+                            generatePDF(quotationId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.convert-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const quotationId = this.getAttribute('data-id');
+                            openConvertModal(quotationId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.delete-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const quotationId = this.getAttribute('data-id');
+                            openDeleteModal(quotationId);
+                        });
+                    });
+                }
+            }
+            
+            // Function to filter quotations
+            function filterQuotations() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const statusFilter = document.getElementById('statusFilter').value;
+                const dateFilter = document.getElementById('dateFilter').value;
+                
+                filteredQuotations = quotations.filter(function(quotation) {
+                    const customer = customers.find(c => c.id === quotation.customerId);
+                    const customerName = customer ? customer.name.toLowerCase() : '';
+                    
+                    const matchesSearch = !searchTerm || 
+                        quotation.number.toLowerCase().includes(searchTerm) ||
+                        customerName.includes(searchTerm) ||
+                        quotation.status.toLowerCase().includes(searchTerm);
+                    
+                    const matchesStatus = !statusFilter || quotation.status === statusFilter;
+                    
+                    let matchesDate = true;
+                    if (dateFilter) {
+                        const quotationDate = new Date(quotation.date);
+                        const today = new Date();
+                        
+                        switch(dateFilter) {
+                            case 'today':
+                                matchesDate = quotationDate.toDateString() === today.toDateString();
+                                break;
+                            case 'week':
+                                const weekAgo = new Date();
+                                weekAgo.setDate(today.getDate() - 7);
+                                matchesDate = quotationDate >= weekAgo;
+                                break;
+                            case 'month':
+                                const monthAgo = new Date();
+                                monthAgo.setMonth(today.getMonth() - 1);
+                                matchesDate = quotationDate >= monthAgo;
+                                break;
+                            case 'year':
+                                const yearAgo = new Date();
+                                yearAgo.setFullYear(today.getFullYear() - 1);
+                                matchesDate = quotationDate >= yearAgo;
+                                break;
+                        }
+                    }
+                    
+                    return matchesSearch && matchesStatus && matchesDate;
+                });
+                
+                renderQuotationsTable();
+            }
+            
+            // Function to open quotation modal
+            function openQuotationModal(quotationId = null) {
+                currentQuotationId = quotationId;
+                
+                // Reset form
+                document.getElementById('quotationForm').reset();
+                
+                // Set today's date as default
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('quotationDate').value = today;
+                
+                // Set valid until date (30 days from today)
+                const validUntil = new Date();
+                validUntil.setDate(validUntil.getDate() + 30);
+                document.getElementById('validUntil').value = validUntil.toISOString().split('T')[0];
+                
+                // Reset items table
+                items = [];
+                renderItemsTable();
+                
+                // Reset calculations
+                updateCalculations();
+                
+                // Generate quotation number
+                generateQuotationNumber();
+                
+                // Set modal title
+                const modalLabel = document.getElementById('quotationModalLabel');
+                if (quotationId) {
+                    modalLabel.textContent = 'Edit Quotation';
+                    
+                    // Find quotation
+                    const quotation = quotations.find(q => q.id === quotationId);
+                    if (quotation) {
+                        // Populate quotation details
+                        document.getElementById('quotationNumber').value = quotation.number;
+                        document.getElementById('quotationDate').value = quotation.date;
+                        document.getElementById('validUntil').value = quotation.validUntil;
+                        document.getElementById('quotationStatus').value = quotation.status;
+                        document.getElementById('companySelect').value = quotation.companyId;
+                        document.getElementById('customerSelect').value = quotation.customerId;
+                        document.getElementById('discountType').value = quotation.discountType || '';
+                        document.getElementById('discountValue').value = quotation.discountValue || 0;
+                        document.getElementById('termsConditions').value = quotation.termsConditions || '';
+                        document.getElementById('notes').value = quotation.notes || '';
+                        
+                        // Populate items
+                        items = [...quotation.items];
+                        renderItemsTable();
+                        
+                        // Update calculations
+                        updateCalculations();
+                    }
+                } else {
+                    modalLabel.textContent = 'Create Quotation';
+                }
+                
+                // Show modal
+                const quotationModal = new bootstrap.Modal(document.getElementById('quotationModal'));
+                quotationModal.show();
+            }
+            
+            // Function to generate quotation number
+            function generateQuotationNumber() {
+                const today = new Date();
+                const year = today.getFullYear().toString().slice(-2);
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                
+                // Count quotations for this month
+                const monthQuotations = quotations.filter(function(quotation) {
+                    const quotationDate = new Date(quotation.date);
+                    return quotationDate.getFullYear() === today.getFullYear() && 
+                           quotationDate.getMonth() === today.getMonth();
+                });
+                
+                const count = monthQuotations.length + 1;
+                const countStr = String(count).padStart(3, '0');
+                
+                document.getElementById('quotationNumber').value = `QT-${year}-${month}-${countStr}`;
+            }
+            
+            // Function to add item
+            function addItem() {
+                const item = {
+                    description: '',
+                    quantity: 1,
+                    unitPrice: 0,
+                    amount: 0
+                };
+                
+                items.push(item);
+                renderItemsTable();
+            }
+            
+            // Function to render items table
+            function renderItemsTable() {
+                const tbody = document.getElementById('itemsTableBody');
+                tbody.innerHTML = '';
+
+                if (items.length === 0) {
+                    // Add one empty item if no items exist
+                    addItem();
+                    return;
+                }
+
+                items.forEach(function(item, index) {
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>
+                            <input type="text" class="item-input" data-field="description" data-index="${index}" value="${item.description}" placeholder="Item description">
+                        </td>
+                        <td>
+                            <input type="number" class="item-input" data-field="quantity" data-index="${index}" value="${item.quantity}" min="1" step="1">
+                        </td>
+                        <td>
+                            <input type="number" class="item-input" data-field="unitPrice" data-index="${index}" value="${item.unitPrice}" min="0" step="0.01">
+                        </td>
+                        <td class="item-amount" data-index="${index}">
+                            ₹${parseFloat(item.amount).toFixed(2)}
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-item-btn" data-index="${index}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    `;
+
+                    tbody.appendChild(row);
+                });
+
+                // Add event listeners to item inputs
+                document.querySelectorAll('.item-input').forEach(function(input) {
+                    // Remove existing listeners by cloning the node to avoid duplicate handlers
+                    const newInput = input.cloneNode(true);
+                    input.parentNode.replaceChild(newInput, input);
+
+                    newInput.addEventListener('input', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        const field = this.getAttribute('data-field');
+                        if (!items[index]) return;
+
+                        const value = field === 'quantity' || field === 'unitPrice' ? parseFloat(this.value) || 0 : this.value;
+
+                        items[index][field] = value;
+
+                        // Calculate amount
+                        if (field === 'quantity' || field === 'unitPrice') {
+                            items[index].amount = items[index].quantity * items[index].unitPrice;
+
+                            // Update amount cell in-place so input keeps focus
+                            const amountCell = document.querySelector(`.item-amount[data-index="${index}"]`);
+                            if (amountCell) {
+                                amountCell.textContent = '₹' + parseFloat(items[index].amount || 0).toFixed(2);
+                            }
+                        }
+
+                        // Update calculations (subtotal/total)
+                        updateCalculations();
+                    });
+                });
+
+                // Add event listeners to remove item buttons
+                document.querySelectorAll('.remove-item-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+
+                        // Remove item
+                        items.splice(index, 1);
+
+                        // Re-render items table
+                        renderItemsTable();
+
+                        // Update calculations
+                        updateCalculations();
+                    });
+                });
+            }
+            
+            // Function to update calculations
+            function updateCalculations() {
+                // Calculate subtotal
+                let subtotal = 0;
+                items.forEach(function(item) {
+                    subtotal += item.amount;
+                });
+                
+                // Calculate discount
+                let discount = 0;
+                const discountType = document.getElementById('discountType').value;
+                const discountValue = parseFloat(document.getElementById('discountValue').value) || 0;
+                
+                if (discountType === 'percentage') {
+                    discount = subtotal * (discountValue / 100);
+                } else if (discountType === 'fixed') {
+                    discount = discountValue;
+                }
+                
+                // Calculate total (without GST)
+                const total = subtotal - discount;
+                
+                // Update display
+                document.getElementById('subtotalDisplay').textContent = '₹' + subtotal.toFixed(2);
+                document.getElementById('discountDisplay').textContent = '₹' + discount.toFixed(2);
+                document.getElementById('totalDisplay').textContent = '₹' + total.toFixed(2);
+                
+                // Update amount in words (include paise)
+                const rupees = Math.floor(total);
+                const paisa = Math.round((total - rupees) * 100);
+                const parts = [];
+                if (rupees > 0) parts.push(numberToWords.toWords(rupees) + (rupees === 1 ? ' Rupee' : ' Rupees'));
+                if (paisa > 0) parts.push(numberToWords.toWords(paisa) + (paisa === 1 ? ' Paisa' : ' Paise'));
+                let words = parts.length > 0 ? parts.join(' and ') : 'zero Rupees';
+                words = words.charAt(0).toUpperCase() + words.slice(1) + ' Only';
+                // Convert to Title Case (words separated by spaces) for display
+                const titleWords = toTitleCase(words);
+                document.getElementById('amountInWords').textContent = titleWords + ' (₹)';
+                
+                // Update quotation preview
+                updateQuotationPreview();
+            }
+            
+            // Function to update quotation preview
+            function updateQuotationPreview() {
+                const preview = document.getElementById('quotationPreview');
+                
+                // Get selected company and customer
+                const companyId = document.getElementById('companySelect').value;
+                const customerId = document.getElementById('customerSelect').value;
+                
+                const company = companies.find(c => c.id === companyId);
+                const customer = customers.find(c => c.id === customerId);
+                
+                // Get form values
+                const quotationNumber = document.getElementById('quotationNumber').value;
+                const quotationDate = document.getElementById('quotationDate').value;
+                const validUntil = document.getElementById('validUntil').value;
+                const termsConditions = document.getElementById('termsConditions').value;
+                const notes = document.getElementById('notes').value;
+                
+                // Calculate totals
+                const subtotal = parseFloat(document.getElementById('subtotalDisplay').textContent.replace('₹', ''));
+                const discount = parseFloat(document.getElementById('discountDisplay').textContent.replace('₹', ''));
+                const total = parseFloat(document.getElementById('totalDisplay').textContent.replace('₹', ''));
+                
+                // Generate items table HTML
+                let itemsTableHTML = '';
+                items.forEach(function(item) {
+                    itemsTableHTML += `
+                        <tr>
+                            <td>${item.description}</td>
+                            <td>${item.quantity}</td>
+                            <td>₹${parseFloat(item.unitPrice).toFixed(2)}</td>
+                            <td>₹${parseFloat(item.amount).toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+                
+                // Generate preview HTML
+                preview.innerHTML = `
+                    <div class="quotation-header">
+                        <div>
+                            <div class="quotation-title">Quotation</div>
+                            <div>Number: ${quotationNumber}</div>
+                            <div>Date: ${formatDate(quotationDate)}</div>
+                            <div>Valid Until: ${formatDate(validUntil)}</div>
+                        </div>
+                        <div>
+                            ${company ? `
+                                <div><strong>${company.name}</strong></div>
+                                <div>${company.address || ''}</div>
+                                <div>${company.email || ''}</div>
+                                <div>${company.phone || ''}</div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="quotation-details">
+                        <div class="quotation-details-row">
+                            <div class="quotation-details-label">Customer:</div>
+                            <div>${customer ? customer.name : ''}</div>
+                        </div>
+                        ${customer ? `
+                            <div class="quotation-details-row">
+                                <div class="quotation-details-label">Address:</div>
+                                <div>${customer.address || ''}</div>
+                            </div>
+                            <div class="quotation-details-row">
+                                <div class="quotation-details-label">Email:</div>
+                                <div>${customer.email || ''}</div>
+                            </div>
+                            <div class="quotation-details-row">
+                                <div class="quotation-details-label">Phone:</div>
+                                <div>${customer.phone || ''}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <table class="quotation-table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Qty</th>
+                                <th>Unit Price (₹)</th>
+                                <th>Amount (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsTableHTML}
+                        </tbody>
+                    </table>
+                    
+                    <div class="quotation-summary">
+                        <table>
+                            <tr>
+                                <td>Subtotal:</td>
+                                <td>₹${subtotal.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td>Discount:</td>
+                                <td>₹${discount.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total:</strong></td>
+                                <td><strong>₹${total.toFixed(2)}</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Amount in Words:</td>
+                                <td>${document.getElementById('amountInWords').textContent}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    ${termsConditions ? `
+                        <div class="mt-3">
+                            <h6>Terms and Conditions</h6>
+                            <p>${termsConditions}</p>
+                        </div>
+                    ` : ''}
+                    
+                    ${notes ? `
+                        <div class="mt-3">
+                            <h6>Notes</h6>
+                            <p>${notes}</p>
+                        </div>
+                    ` : ''}
+                `;
+            }
+            
+            // Function to save quotation
+            function saveQuotation() {
+                // Validate form
+                const companyId = document.getElementById('companySelect').value;
+                const customerId = document.getElementById('customerSelect').value;
+                const quotationDate = document.getElementById('quotationDate').value;
+                const validUntil = document.getElementById('validUntil').value;
+                
+                if (!companyId || !customerId || !quotationDate || !validUntil) {
+                    showNotification('Please fill in all required fields', 'danger');
+                    return;
+                }
+                
+                // Check if items are valid
+                let validItems = true;
+                items.forEach(function(item) {
+                    if (!item.description || item.quantity <= 0 || item.unitPrice < 0) {
+                        validItems = false;
+                    }
+                });
+                
+                if (!validItems || items.length === 0) {
+                    showNotification('Please add valid items', 'danger');
+                    return;
+                }
+                
+                // Get form data
+                const quotationData = {
+                    number: document.getElementById('quotationNumber').value,
+                    date: quotationDate,
+                    validUntil: validUntil,
+                    status: document.getElementById('quotationStatus').value,
+                    companyId: companyId,
+                    customerId: customerId,
+                    items: [...items],
+                    discountType: document.getElementById('discountType').value,
+                    discountValue: parseFloat(document.getElementById('discountValue').value) || 0,
+                    termsConditions: document.getElementById('termsConditions').value,
+                    notes: document.getElementById('notes').value,
+                    subtotal: parseFloat(document.getElementById('subtotalDisplay').textContent.replace('₹', '')),
+                    discount: parseFloat(document.getElementById('discountDisplay').textContent.replace('₹', '')),
+                    total: parseFloat(document.getElementById('totalDisplay').textContent.replace('₹', ''))
+                };
+                
+                // Show loading overlay
+                document.getElementById('loadingOverlay').classList.add('active');
+                
+                if (currentQuotationId) {
+                    // Update existing quotation
+                    const index = quotations.findIndex(q => q.id === currentQuotationId);
+                    if (index !== -1) {
+                        // Preserve ID and creation date
+                        quotationData.id = currentQuotationId;
+                        quotationData.createdAt = quotations[index].createdAt;
+                        quotationData.updatedAt = new Date().toISOString();
+                        
+                        // Update quotation
+                        quotations[index] = quotationData;
+                    }
+                } else {
+                    // Add new quotation
+                    quotationData.id = generateId();
+                    quotationData.createdAt = new Date().toISOString();
+                    quotationData.updatedAt = new Date().toISOString();
+                    
+                    quotations.push(quotationData);
+                }
+                
+                // Sort quotations by date (newest first)
+                quotations.sort(function(a, b) {
+                    return new Date(b.date) - new Date(a.date);
+                });
+                
+                // Save to local storage
+                localforage.setItem('quotations', quotations)
+                    .then(function() {
+                        // Update filtered quotations
+                        filteredQuotations = [...quotations];
+                        
+                        // Render quotations table
+                        renderQuotationsTable();
+                        
+                        // Hide modal
+                        const quotationModal = bootstrap.Modal.getInstance(document.getElementById('quotationModal'));
+                        quotationModal.hide();
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        
+                        // Show success message
+                        showNotification('Quotation saved successfully', 'success');
+                    })
+                    .catch(function(err) {
+                        console.error('Error saving quotation:', err);
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        
+                        // Show error message
+                        showNotification('Error saving quotation', 'danger');
+                    });
+            }
+            
+            // Function to open preview modal
+            function openPreviewModal(quotationId) {
+                // Find quotation
+                const quotation = quotations.find(q => q.id === quotationId);
+                if (!quotation) {
+                    showNotification('Quotation not found', 'danger');
+                    return;
+                }
+                
+                // Store the quotation ID for PDF download
+                previewQuotationId = quotationId;
+                
+                // Find company and customer
+                const company = companies.find(c => c.id === quotation.companyId);
+                const customer = customers.find(c => c.id === quotation.customerId);
+                
+                // Generate preview content
+                const previewContent = document.getElementById('previewContent');
+                
+                // Generate items table HTML
+                let itemsTableHTML = '';
+                quotation.items.forEach(function(item) {
+                    itemsTableHTML += `
+                        <tr>
+                            <td>${item.description}</td>
+                            <td>${item.quantity}</td>
+                            <td>₹${parseFloat(item.unitPrice).toFixed(2)}</td>
+                            <td>₹${parseFloat(item.amount).toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+                
+                // Generate preview HTML
+                previewContent.innerHTML = `
+                    <div class="quotation-header">
+                        <div>
+                            <div class="quotation-title">Quotation</div>
+                            <div>Number: ${quotation.number}</div>
+                            <div>Date: ${formatDate(quotation.date)}</div>
+                            <div>Valid Until: ${formatDate(quotation.validUntil)}</div>
+                        </div>
+                        <div>
+                            ${company ? `
+                                <div><strong>${company.name}</strong></div>
+                                <div>${company.address || ''}</div>
+                                <div>${company.email || ''}</div>
+                                <div>${company.phone || ''}</div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="quotation-details">
+                        <div class="quotation-details-row">
+                            <div class="quotation-details-label">Customer:</div>
+                            <div>${customer ? customer.name : ''}</div>
+                        </div>
+                        ${customer ? `
+                            <div class="quotation-details-row">
+                                <div class="quotation-details-label">Address:</div>
+                                <div>${customer.address || ''}</div>
+                            </div>
+                            <div class="quotation-details-row">
+                                <div class="quotation-details-label">Email:</div>
+                                <div>${customer.email || ''}</div>
+                            </div>
+                            <div class="quotation-details-row">
+                                <div class="quotation-details-label">Phone:</div>
+                                <div>${customer.phone || ''}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <table class="quotation-table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Qty</th>
+                                <th>Unit Price (₹)</th>
+                                <th>Amount (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsTableHTML}
+                        </tbody>
+                    </table>
+                    
+                    <div class="quotation-summary">
+                        <table>
+                            <tr>
+                                <td>Subtotal:</td>
+                                <td>₹${quotation.subtotal.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td>Discount:</td>
+                                <td>₹${quotation.discount.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total:</strong></td>
+                                <td><strong>₹${quotation.total.toFixed(2)}</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    ${quotation.termsConditions ? `
+                        <div class="mt-3">
+                            <h6>Terms and Conditions</h6>
+                            <p>${quotation.termsConditions}</p>
+                        </div>
+                    ` : ''}
+                    
+                    ${quotation.notes ? `
+                        <div class="mt-3">
+                            <h6>Notes</h6>
+                            <p>${quotation.notes}</p>
+                        </div>
+                    ` : ''}
+                `;
+                
+                // Show modal
+                const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+                previewModal.show();
+            }
+            
+            // Function to generate PDF
+            function generatePDF(quotationId) {
+                // Find quotation
+                const quotation = quotations.find(q => q.id === quotationId);
+                if (!quotation) {
+                    showNotification('Quotation not found', 'danger');
+                    return;
+                }
+                
+                // Find company and customer
+                const company = companies.find(c => c.id === quotation.companyId);
+                const customer = customers.find(c => c.id === quotation.customerId);
+                
+                // Show loading overlay
+                document.getElementById('loadingOverlay').classList.add('active');
+                
+                // Create a new jsPDF instance
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add company logo if available
+                if (company && company.logo) {
+                    try {
+                        doc.addImage(company.logo, 'PNG', 15, 15, 30, 30);
+                    } catch (e) {
+                        console.error('Error adding logo to PDF:', e);
+                    }
+                }
+                
+                // Add quotation details
+                doc.setFontSize(20);
+                doc.text('Quotation', 105, 30, { align: 'center' });
+                
+                doc.setFontSize(12);
+                doc.text(`Quotation No: ${quotation.number}`, 15, 50);
+                doc.text(`Date: ${formatDate(quotation.date)}`, 15, 57);
+                doc.text(`Valid Until: ${formatDate(quotation.validUntil)}`, 15, 64);
+                
+                // Add company details
+                if (company) {
+                    doc.setFontSize(12);
+                    doc.text('Bill From:', 105, 50);
+                    doc.setFontSize(12);
+                    doc.text(company.name, 105, 57);
+                    if (company.address) {
+                        const splitAddress = doc.splitTextToSize(company.address, 90);
+                        doc.text(splitAddress, 105, 64);
+                    }
+                    if (company.email) doc.text(`Email: ${company.email}`, 105, 75);
+                    if (company.phone) doc.text(`Phone: ${company.phone}`, 105, 82);
+                }
+                
+                // Add customer details
+                if (customer) {
+                    doc.setFontSize(12);
+                    doc.text('Bill To:', 15, 80);
+                    doc.setFontSize(12);
+                    doc.text(customer.name, 15, 87);
+                    if (customer.address) {
+                        const splitAddress = doc.splitTextToSize(customer.address, 90);
+                        doc.text(splitAddress, 15, 94);
+                    }
+                    if (customer.email) doc.text(`Email: ${customer.email}`, 15, 105);
+                    if (customer.phone) doc.text(`Phone: ${customer.phone}`, 15, 112);
+                }
+                
+                // Add items table with serial number (use ASCII 'Rs.' for PDF)
+                const tableData = quotation.items.map((item, idx) => [
+                    String(idx + 1),
+                    item.description,
+                    item.quantity.toString(),
+                    `Rs. ${parseFloat(item.unitPrice).toFixed(2)}`,
+                    `Rs. ${parseFloat(item.amount).toFixed(2)}`
+                ]);
+                
+                doc.autoTable({
+                    head: [['S.No', 'Description', 'Quantity', 'Unit Price', 'Amount']],
+                    body: tableData,
+                    startY: 120,
+                    theme: 'striped',
+                    headStyles: {
+                        fillColor: [74, 108, 247]
+                    }
+                });
+                
+                // Add summary
+                const finalY = doc.lastAutoTable.finalY + 10;
+                
+                doc.autoTable({
+                    body: [
+                        ['Subtotal:', `Rs. ${quotation.subtotal.toFixed(2)}`],
+                        ['Discount:', `Rs. ${quotation.discount.toFixed(2)}`],
+                        ['Total:', `Rs. ${quotation.total.toFixed(2)}`]
+                    ],
+                    startY: finalY,
+                    theme: 'plain',
+                    tableWidth: 'wrap',
+                    margin: { left: 14 },
+                    styles: {
+                        cellPadding: { top: 2, right: 2, bottom: 2, left: 2 },
+                        fontSize: 10
+                    },
+                    columnStyles: {
+                        0: { fontStyle: 'bold', halign: 'left', cellWidth: 38 },
+                        1: { halign: 'left', cellWidth: 62 }
+                    }
+                });
+                
+                // Add amount in words for PDF (include paise; use ASCII words)
+                const pdfRupees = Math.floor(quotation.total);
+                const pdfPaisa = Math.round((quotation.total - pdfRupees) * 100);
+                const pdfParts = [];
+                if (pdfRupees > 0) pdfParts.push(numberToWords.toWords(pdfRupees) + (pdfRupees === 1 ? ' Rupee' : ' Rupees'));
+                if (pdfPaisa > 0) pdfParts.push(numberToWords.toWords(pdfPaisa) + (pdfPaisa === 1 ? ' Paisa' : ' Paise'));
+                let pdfWords = pdfParts.length > 0 ? pdfParts.join(' and ') : 'zero Rupees';
+                pdfWords = pdfWords.charAt(0).toUpperCase() + pdfWords.slice(1) + ' Only';
+                // Convert to Title Case for PDF words
+                const titlePdfWords = toTitleCase(pdfWords);
+                doc.setFontSize(10);
+                doc.text(`Amount in Words: ${titlePdfWords}`, 15, doc.lastAutoTable.finalY + 10);
+                
+                // Add terms and conditions
+                if (quotation.termsConditions) {
+                    doc.setFontSize(12);
+                    doc.text('Terms and Conditions:', 15, doc.lastAutoTable.finalY + 20);
+                    doc.setFontSize(10);
+                    const splitTerms = doc.splitTextToSize(quotation.termsConditions, 180);
+                    doc.text(splitTerms, 15, doc.lastAutoTable.finalY + 27);
+                }
+                
+                // Add notes
+                if (quotation.notes) {
+                    doc.setFontSize(12);
+                    doc.text('Notes:', 15, doc.lastAutoTable.finalY + 40);
+                    doc.setFontSize(10);
+                    const splitNotes = doc.splitTextToSize(quotation.notes, 180);
+                    doc.text(splitNotes, 15, doc.lastAutoTable.finalY + 47);
+                }
+                
+                // Add signature if available
+                if (company && company.signature) {
+                    try {
+                        doc.addImage(company.signature, 'PNG', 150, doc.lastAutoTable.finalY + 60, 40, 20);
+                        doc.setFontSize(10);
+                        doc.text('Authorized Signature', 160, doc.lastAutoTable.finalY + 85);
+                    } catch (e) {
+                        console.error('Error adding signature to PDF:', e);
+                    }
+                }
+                
+                // Add a footer on every page indicating generated document
+                try {
+                    const footerText = 'This is a Computer Generated Quotation';
+                    const pageCount = typeof doc.getNumberOfPages === 'function' ? doc.getNumberOfPages() : doc.internal.getNumberOfPages();
+                    for (let i = 1; i <= pageCount; i++) {
+                        doc.setPage(i);
+                        // Use italic font for the footer, then restore to normal
+                        try {
+                            doc.setFont('helvetica', 'italic');
+                        } catch (e) {
+                            // Fallback if setFont signature differs
+                            try { doc.setFont(undefined, 'italic'); } catch (err) {}
+                        }
+                        doc.setFontSize(9);
+                        doc.setTextColor(120);
+                        const pageWidth = doc.internal.pageSize.getWidth();
+                        const pageHeight = doc.internal.pageSize.getHeight();
+                        doc.text(footerText, pageWidth / 2, pageHeight - 10, { align: 'center' });
+                        // Restore to normal font style
+                        try {
+                            doc.setFont('helvetica', 'normal');
+                        } catch (e) {
+                            try { doc.setFont(undefined, 'normal'); } catch (err) {}
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error adding footer to PDF:', e);
+                }
+
+                // Save PDF
+                doc.save(`Quotation_${quotation.number}.pdf`);
+                
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').classList.remove('active');
+                
+                // Show success message
+                showNotification('PDF generated successfully', 'success');
+            }
+            
+            // Function to open delete modal
+            function openDeleteModal(quotationId) {
+                deleteQuotationId = quotationId;
+                
+                // Show modal
+                const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                deleteModal.show();
+            }
+            
+            // Function to delete quotation
+            function deleteQuotation(quotationId) {
+                // Show loading overlay
+                document.getElementById('loadingOverlay').classList.add('active');
+                
+                // Find quotation index
+                const index = quotations.findIndex(q => q.id === quotationId);
+                if (index !== -1) {
+                    // Remove quotation
+                    quotations.splice(index, 1);
+                    
+                    // Save to local storage
+                    localforage.setItem('quotations', quotations)
+                        .then(function() {
+                            // Update filtered quotations
+                            filteredQuotations = [...quotations];
+                            
+                            // Render quotations table
+                            renderQuotationsTable();
+                            
+                            // Hide modal
+                            const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                            deleteModal.hide();
+                            
+                            // Hide loading overlay
+                            document.getElementById('loadingOverlay').classList.remove('active');
+                            
+                            // Show success message
+                            showNotification('Quotation deleted successfully', 'success');
+                        })
+                        .catch(function(err) {
+                            console.error('Error deleting quotation:', err);
+                            
+                            // Hide loading overlay
+                            document.getElementById('loadingOverlay').classList.remove('active');
+                            
+                            // Show error message
+                            showNotification('Error deleting quotation', 'danger');
+                        });
+                }
+            }
+            
+            // Function to open convert modal
+            function openConvertModal(quotationId) {
+                convertQuotationId = quotationId;
+                
+                // Set default dates
+                const today = new Date().toISOString().split('T')[0];
+                const dueDate = new Date();
+                dueDate.setDate(dueDate.getDate() + 30);
+                
+                document.getElementById('invoiceDate').value = today;
+                document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
+                
+                // Show modal
+                const convertModal = new bootstrap.Modal(document.getElementById('convertModal'));
+                convertModal.show();
+            }
+            
+            // Function to convert quotation to invoice
+            function convertToInvoice(quotationId) {
+                // Find quotation
+                const quotation = quotations.find(q => q.id === quotationId);
+                if (!quotation) {
+                    showNotification('Quotation not found', 'danger');
+                    return;
+                }
+                
+                // Show loading overlay
+                document.getElementById('loadingOverlay').classList.add('active');
+                
+                // Load invoices
+                localforage.getItem('invoices')
+                    .then(function(invoices) {
+                        invoices = invoices || [];
+                        
+                        // Generate invoice number
+                        const today = new Date();
+                        const year = today.getFullYear().toString().slice(-2);
+                        const month = String(today.getMonth() + 1).padStart(2, '0');
+                        
+                        // Count invoices for this month
+                        const monthInvoices = invoices.filter(function(invoice) {
+                            const invoiceDate = new Date(invoice.date);
+                            return invoiceDate.getFullYear() === today.getFullYear() && 
+                                   invoiceDate.getMonth() === today.getMonth();
+                        });
+                        
+                        const count = monthInvoices.length + 1;
+                        const countStr = String(count).padStart(3, '0');
+                        
+                        // Create invoice from quotation (compute missing fields)
+                        const invItems = (quotation.items || []).map(function(item) {
+                            const qty = parseFloat(item.quantity) || 0;
+                            const price = parseFloat(item.unitPrice) || 0;
+                            const amt = typeof item.amount === 'number' ? item.amount : qty * price;
+                            const gst = parseFloat(item.gst) || 0;
+                            return {
+                                description: item.description,
+                                hsnSac: item.hsnSac || '',
+                                quantity: qty,
+                                unitPrice: price,
+                                gst: gst,
+                                amount: amt
+                            };
+                        });
+                        let subtotalCalc = 0;
+                        let totalGstCalc = 0;
+                        invItems.forEach(function(it) {
+                            subtotalCalc += it.amount;
+                            totalGstCalc += it.amount * (it.gst / 100);
+                        });
+                        const cgstCalc = totalGstCalc / 2;
+                        const sgstCalc = totalGstCalc / 2;
+                        const discountType = quotation.discountType || '';
+                        const discountValue = parseFloat(quotation.discountValue) || 0;
+                        let discountCalc = 0;
+                        if (discountType === 'percentage') {
+                            discountCalc = subtotalCalc * (discountValue / 100);
+                        } else if (discountType === 'fixed') {
+                            discountCalc = discountValue;
+                        }
+                        const totalCalc = subtotalCalc + totalGstCalc - discountCalc;
+                        const rupees = Math.floor(totalCalc);
+                        const paisa = Math.round((totalCalc - rupees) * 100);
+                        const parts = [];
+                        if (rupees > 0) parts.push(numberToWords.toWords(rupees) + (rupees === 1 ? ' Rupee' : ' Rupees'));
+                        if (paisa > 0) parts.push(numberToWords.toWords(paisa) + (paisa === 1 ? ' Paisa' : ' Paise'));
+                        let words = parts.length > 0 ? parts.join(' and ') : 'zero Rupees';
+                        words = words.charAt(0).toUpperCase() + words.slice(1) + ' Only';
+                        const amountInWords = toTitleCase(words);
+
+                        const invoice = {
+                            id: generateId(),
+                            number: `INV-${year}-${month}-${countStr}`,
+                            date: document.getElementById('invoiceDate').value,
+                            dueDate: document.getElementById('dueDate').value,
+                            status: 'draft',
+                            companyId: quotation.companyId,
+                            customerId: quotation.customerId,
+                            items: invItems,
+                            discountType: discountType,
+                            discountValue: discountValue,
+                            termsConditions: quotation.termsConditions,
+                            notes: quotation.notes,
+                            subtotal: subtotalCalc,
+                            cgst: cgstCalc,
+                            sgst: sgstCalc,
+                            totalGst: totalGstCalc,
+                            discount: discountCalc,
+                            total: totalCalc,
+                            amountInWords: amountInWords,
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString()
+                        };
+                        
+                        // Add invoice
+                        invoices.push(invoice);
+                        
+                        // Sort invoices by date (newest first)
+                        invoices.sort(function(a, b) {
+                            return new Date(b.date) - new Date(a.date);
+                        });
+                        
+                        // Save invoices
+                        return localforage.setItem('invoices', invoices);
+                    })
+                    .then(function() {
+                        // Update quotation status
+                        const index = quotations.findIndex(q => q.id === quotationId);
+                        if (index !== -1) {
+                            quotations[index].status = 'converted';
+                            quotations[index].updatedAt = new Date().toISOString();
+                            
+                            // Save quotations
+                            return localforage.setItem('quotations', quotations);
+                        }
+                    })
+                    .then(function() {
+                        // Update filtered quotations
+                        filteredQuotations = [...quotations];
+                        
+                        // Render quotations table
+                        renderQuotationsTable();
+                        
+                        // Hide modal
+                        const convertModal = bootstrap.Modal.getInstance(document.getElementById('convertModal'));
+                        convertModal.hide();
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        
+                        // Show success message
+                        showNotification('Quotation converted to invoice successfully', 'success');
+                    })
+                    .catch(function(err) {
+                        console.error('Error converting quotation to invoice:', err);
+                        
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        
+                        // Show error message
+                        showNotification('Error converting quotation to invoice', 'danger');
+                    });
+            }
+            
+            // Function to export quotations
+            function exportQuotations() {
+                // Show loading overlay
+                document.getElementById('loadingOverlay').classList.add('active');
+                
+                // Create a new jsPDF instance
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add title
+                doc.setFontSize(18);
+                doc.text('Quotations List', 14, 22);
+                
+                // Add date
+                doc.setFontSize(11);
+                doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+                
+                // Prepare table data
+                const tableData = filteredQuotations.map(quotation => {
+                    const customer = customers.find(c => c.id === quotation.customerId);
+                    return [
+                        quotation.number,
+                        formatDate(quotation.date),
+                        customer ? customer.name : 'Unknown',
+                        `Rs. ${parseFloat(quotation.total).toFixed(2)}`,
+                        quotation.status
+                    ];
+                });
+                
+                // Add table
+                doc.autoTable({
+                    head: [['Quotation No.', 'Date', 'Customer', 'Amount (Rs.)', 'Status']],
+                    body: tableData,
+                    startY: 40,
+                    theme: 'striped',
+                    headStyles: {
+                        fillColor: [74, 108, 247]
+                    }
+                });
+                
+                // Save PDF
+                doc.save('quotations.pdf');
+                
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').classList.remove('active');
+                
+                // Show success message
+                showNotification('Quotations exported successfully', 'success');
+            }
+            
+            // Function to preview quotation
+            function previewQuotation() {
+                // Get form data
+                const companyId = document.getElementById('companySelect').value;
+                const customerId = document.getElementById('customerSelect').value;
+                
+                if (!companyId || !customerId) {
+                    showNotification('Please select company and customer', 'danger');
+                    return;
+                }
+                
+                // Update quotation preview
+                updateQuotationPreview();
+                
+                // Scroll to preview
+                document.getElementById('quotationPreview').scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            // Function to format date
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            }
+            
+            // Function to generate a unique ID
+            function generateId() {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2);
+            }
+
+            // Helper: convert phrase to Title Case (words separated by spaces, first letter capitalized)
+            function toTitleCase(phrase) {
+                const words = String(phrase).match(/[A-Za-z0-9]+/g) || [];
+                return words.map(function(w) { return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }).join(' ');
+            }
+            
+            // Function to show notification
+            function showNotification(message, type) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                notification.style.top = '20px';
+                notification.style.right = '20px';
+                notification.style.zIndex = '9999';
+                notification.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                
+                // Add to body
+                document.body.appendChild(notification);
+                
+                // Auto dismiss after 5 seconds
+                setTimeout(function() {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>
