@@ -507,7 +507,7 @@
             </div>
             <div class="nav-item">
                 <a href="company.html" class="nav-link active">
-                    <i class="bi bi-building"></i>
+                    <i class="bi bi-briefcase"></i>
                     <span>Company</span>
                 </a>
             </div>
@@ -661,6 +661,9 @@
                                             <div class="placeholder">No logo</div>
                                         </div>
                                     </div>
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" id="removeLogoBtn"><i class="bi bi-trash"></i> Remove</button>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="companySignature" class="form-label">Signature</label>
@@ -669,6 +672,9 @@
                                         <div class="image-preview" id="signaturePreview">
                                             <div class="placeholder">No signature</div>
                                         </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" id="removeSignatureBtn"><i class="bi bi-trash"></i> Remove</button>
                                     </div>
                                 </div>
                                 <div class="col-12">
@@ -748,6 +754,9 @@
                                             <div class="placeholder">No QR code</div>
                                         </div>
                                     </div>
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" id="removeUpiQrBtn"><i class="bi bi-trash"></i> Remove</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -797,105 +806,111 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize localForage
-            localforage.config({
-                name: 'InvoiceProDB',
-                storeName: 'data'
+            localStorage.removeItem('internalNav');
+            document.addEventListener('click', function(e){
+                const a = e.target.closest('a[href]');
+                if (!a) return;
+                try {
+                    const u = new URL(a.href, window.location.href);
+                    if (u.origin === window.location.origin && u.pathname.endsWith('.html')) {
+                        localStorage.setItem('internalNav','1');
+                    }
+                } catch(_) {}
             });
-            (function(){
-                const SUPABASE_URL = 'https://nnazbmwzqvzzuyecvlik.supabase.co';
-                const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uYXpibXd6cXZ6enV5ZWN2bGlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MzAwNzksImV4cCI6MjA3OTIwNjA3OX0.ENU4UT-QnWL2G1D3Lvpq-YLDgnorqJaeEgChirwaV28';
-                const remoteTables = ['companies','customers','invoices','quotations'];
-                const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-                async function verifyRemoteSetup(){
+            localforage.config({ name: 'InvoiceProDB', storeName: 'data' });
+            const SUPABASE_URL = 'https://nnazbmwzqvzzuyecvlik.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uYXpibXd6cXZ6enV5ZWN2bGlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MzAwNzksImV4cCI6MjA3OTIwNjA3OX0.ENU4UT-QnWL2G1D3Lvpq-YLDgnorqJaeEgChirwaV28';
+            const remoteTables = ['companies','customers','invoices','quotations'];
+            const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+            async function verifyRemoteSetup(){
+                try {
                     if (!sb) return;
                     if (localStorage.getItem('supabase_setup_shown')==='1') return;
-                    try {
-                        const { data, error } = await sb.from('app_store').select('key').limit(1);
-                        if (error) {
-                            showSupabaseSetupModal(error.message || 'Remote not accessible');
-                            localStorage.setItem('supabase_setup_shown','1');
-                        }
-                    } catch (err) {
-                        showSupabaseSetupModal(err && err.message ? err.message : 'Remote not accessible');
+                    const { error } = await sb.from('app_store').select('key').limit(1);
+                    if (error) {
+                        showSupabaseSetupModal(error.message || 'Remote not accessible');
                         localStorage.setItem('supabase_setup_shown','1');
                     }
+                } catch (err) {
+                    showSupabaseSetupModal(err && err.message ? err.message : 'Remote not accessible');
+                    localStorage.setItem('supabase_setup_shown','1');
                 }
-                function showSupabaseSetupModal(reason){
-                    if (!document.getElementById('supabaseSetupModal')){
-                        const div = document.createElement('div');
-                        div.innerHTML = (
-                            '<div class="modal fade" id="supabaseSetupModal" tabindex="-1" aria-hidden="true">'
-                            + '<div class="modal-dialog modal-lg modal-dialog-scrollable">'
-                            + '<div class="modal-content">'
-                            + '<div class="modal-header">'
-                            + '<h5 class="modal-title">Supabase Setup Required</h5>'
-                            + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'
-                            + '</div>'
-                            + '<div class="modal-body">'
-                            + '<p>Remote database is not ready. Reason: ' + String(reason) + '</p>'
-                            + '<p>Steps to configure your Supabase project:</p>'
-                            + '<ol>'
-                            + '<li>Open SQL editor in Supabase.</li>'
-                            + '<li>Create the table in the public schema:</li>'
-                            + '</ol>'
-                            + '<pre><code>create table if not exists public.app_store (\n  key text primary key,\n  value jsonb not null\n);\nalter table public.app_store enable row level security;\ncreate policy "Allow read to anon" on public.app_store for select using (true);\ncreate policy "Allow insert to anon" on public.app_store for insert with check (true);\ncreate policy "Allow update to anon" on public.app_store for update using (true) with check (true);\ncreate policy "Allow delete to anon" on public.app_store for delete using (true);\n</code></pre>'
-                            + '<p>Ensure the anon public key is enabled for your project and the policies allow reads and writes.</p>'
-                            + '</div>'
-                            + '<div class="modal-footer">'
-                            + '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>'
-                            + '</div>'
-                            + '</div>'
-                            + '</div>'
-                            + '</div>'
-                        );
-                        document.body.appendChild(div);
-                    }
-                    const modalEl = document.getElementById('supabaseSetupModal');
-                    if (window.bootstrap && window.bootstrap.Modal) {
-                        const modal = new window.bootstrap.Modal(modalEl);
-                        modal.show();
-                    } else {
-                        modalEl.style.display = 'block';
-                    }
+            }
+            function showSupabaseSetupModal(reason){
+                if (!document.getElementById('supabaseSetupModal')){
+                    const div = document.createElement('div');
+                    div.innerHTML = (
+                        '<div class="modal fade" id="supabaseSetupModal" tabindex="-1" aria-hidden="true">'
+                        + '<div class="modal-dialog modal-lg modal-dialog-scrollable">'
+                        + '<div class="modal-content">'
+                        + '<div class="modal-header">'
+                        + '<h5 class="modal-title">Supabase Setup Required</h5>'
+                        + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'
+                        + '</div>'
+                        + '<div class="modal-body">'
+                        + '<p>Remote database is not ready. Reason: ' + String(reason) + '</p>'
+                        + '<p>Steps to configure your Supabase project:</p>'
+                        + '<ol>'
+                        + '<li>Open SQL editor in Supabase.</li>'
+                        + '<li>Create the table in the public schema:</li>'
+                        + '</ol>'
+                        + '<pre><code>create table if not exists public.app_store (\n  key text primary key,\n  value jsonb not null\n);\nalter table public.app_store enable row level security;\ncreate policy "Allow read to anon" on public.app_store for select using (true);\ncreate policy "Allow insert to anon" on public.app_store for insert with check (true);\ncreate policy "Allow update to anon" on public.app_store for update using (true) with check (true);\ncreate policy "Allow delete to anon" on public.app_store for delete using (true);\n</code></pre>'
+                        + '<p>Ensure the anon public key is enabled for your project and the policies allow reads and writes.</p>'
+                        + '</div>'
+                        + '<div class="modal-footer">'
+                        + '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>'
+                        + '</div>'
+                        + '</div>'
+                        + '</div>'
+                        + '</div>'
+                    );
+                    document.body.appendChild(div);
                 }
-                async function remoteGet(key){ try { if (!sb || remoteTables.indexOf(key)===-1) return null; const { data, error } = await sb.from('app_store').select('value').eq('key', key); if (error) return null; return Array.isArray(data)&&data.length?data[0].value:null; } catch(_) { return null; } }
-                async function remoteUpsert(key,value){ try { if (!sb || remoteTables.indexOf(key)===-1) return; await sb.from('app_store').upsert({ key, value }, { onConflict: 'key' }); } catch(_) {} }
-                const originalGetItem = localforage.getItem.bind(localforage);
-                const originalSetItem = localforage.setItem.bind(localforage);
-                localforage.getItem = async function(key){ const remote = await remoteGet(key); if (remote!==null && remote!==undefined){ await originalSetItem(key, remote); return remote; } return originalGetItem(key); };
-                localforage.setItem = async function(key,value){ await remoteUpsert(key,value); return originalSetItem(key,value); };
-                verifyRemoteSetup();
-                function updateOnlineIndicator(){
-                    const el = document.getElementById('onlineIndicator');
-                    if (!el) return;
-                    const online = navigator.onLine;
-                    el.textContent = online ? 'Online' : 'Offline';
+                const modalEl = document.getElementById('supabaseSetupModal');
+                if (window.bootstrap && window.bootstrap.Modal) {
+                    const modal = new window.bootstrap.Modal(modalEl);
+                    modal.show();
+                } else {
+                    modalEl.style.display = 'block';
+                }
+            }
+            async function remoteUpsert(key,value){ try { if (!sb || remoteTables.indexOf(key)===-1) return; await sb.from('app_store').upsert({ key, value }, { onConflict: 'key' }); } catch(_) {} }
+            async function uploadLocalStore(progress){
+                const keys = await localforage.keys();
+                const total = keys.length; let done = 0;
+                for (const k of keys){ const v = await localforage.getItem(k); await remoteUpsert(k,v); done++; if (typeof progress==='function') progress(done/total); }
+            }
+            let autoUploadTimer = setInterval(async function(){ try { await uploadLocalStore(); } catch(_) {} }, 30000);
+            function updateOnlineIndicator(){
+                const el = document.getElementById('onlineIndicator');
+                if (!el) return;
+                const online = navigator.onLine;
+                el.textContent = online ? 'Online' : 'Offline';
+                el.classList.remove('bg-secondary','bg-success','bg-danger');
+                el.classList.add(online ? 'bg-success' : 'bg-danger');
+            }
+            async function updateRemoteDbIndicator(){
+                const el = document.getElementById('remoteDbIndicator');
+                if (!el) return;
+                try {
+                    if (!sb) { el.textContent = 'Offline'; el.classList.remove('bg-secondary','bg-success','bg-danger'); el.classList.add('bg-danger'); return; }
+                    const { error } = await sb.from('app_store').select('key').limit(1);
+                    const ok = !error;
+                    el.textContent = ok ? 'Online' : 'Offline';
                     el.classList.remove('bg-secondary','bg-success','bg-danger');
-                    el.classList.add(online ? 'bg-success' : 'bg-danger');
+                    el.classList.add(ok ? 'bg-success' : 'bg-danger');
+                } catch(_) {
+                    el.textContent = 'Offline';
+                    el.classList.remove('bg-secondary','bg-success','bg-danger');
+                    el.classList.add('bg-danger');
                 }
-                async function updateRemoteDbIndicator(){
-                    const el = document.getElementById('remoteDbIndicator');
-                    if (!el) return;
-                    try {
-                        if (!sb) { el.textContent = 'Offline'; el.classList.remove('bg-secondary','bg-success','bg-danger'); el.classList.add('bg-danger'); return; }
-                        const { error } = await sb.from('app_store').select('key').limit(1);
-                        const ok = !error;
-                        el.textContent = ok ? 'Online' : 'Offline';
-                        el.classList.remove('bg-secondary','bg-success','bg-danger');
-                        el.classList.add(ok ? 'bg-success' : 'bg-danger');
-                    } catch(_) {
-                        el.textContent = 'Offline';
-                        el.classList.remove('bg-secondary','bg-success','bg-danger');
-                        el.classList.add('bg-danger');
-                    }
-                }
-                updateOnlineIndicator();
-                updateRemoteDbIndicator();
-                window.addEventListener('online', updateOnlineIndicator);
-                window.addEventListener('offline', updateOnlineIndicator);
-                setInterval(updateRemoteDbIndicator, 60000);
-            })();
+            }
+            updateOnlineIndicator();
+            updateRemoteDbIndicator();
+            window.addEventListener('online', updateOnlineIndicator);
+            window.addEventListener('offline', updateOnlineIndicator);
+            setInterval(updateRemoteDbIndicator, 60000);
+            verifyRemoteSetup();
             
             // Initialize variables
             let companies = [];
@@ -925,9 +940,17 @@
                     document.getElementById('sidebar').classList.toggle('active');
                 });
                 
-                // Logout button
-                document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                document.getElementById('logoutBtn').addEventListener('click', async function(e){
                     e.preventDefault();
+                    const modalEl = document.getElementById('syncModal');
+                    const bar = document.getElementById('syncProgressBar');
+                    const modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+                    try { await uploadLocalStore(function(p){ if (bar) bar.style.width = Math.round(p*100)+'%'; }); } catch(_) {}
+                    localStorage.removeItem('sessionActive');
+                    await localforage.setItem('authenticated', false);
+                    modal.hide();
+                    localStorage.setItem('internalNav','1');
                     window.location.href = 'index.html';
                 });
                 
@@ -973,16 +996,22 @@
                 document.getElementById('companyLogo').addEventListener('change', function(e) {
                     handleImageUpload(e, 'logoPreview');
                 });
+                const removeLogoBtn = document.getElementById('removeLogoBtn');
+                if (removeLogoBtn) removeLogoBtn.addEventListener('click', function(){ clearImage('logoPreview','companyLogo','No logo'); });
                 
                 // Company signature input
                 document.getElementById('companySignature').addEventListener('change', function(e) {
                     handleImageUpload(e, 'signaturePreview');
                 });
+                const removeSignatureBtn = document.getElementById('removeSignatureBtn');
+                if (removeSignatureBtn) removeSignatureBtn.addEventListener('click', function(){ clearImage('signaturePreview','companySignature','No signature'); });
                 
                 // UPI QR code input
                 document.getElementById('upiQrCode').addEventListener('change', function(e) {
                     handleImageUpload(e, 'upiQrPreview');
                 });
+                const removeUpiQrBtn = document.getElementById('removeUpiQrBtn');
+                if (removeUpiQrBtn) removeUpiQrBtn.addEventListener('click', function(){ clearImage('upiQrPreview','upiQrCode','No QR code'); });
                 
                 // Copy buttons for UPI
                 document.querySelectorAll('.copy-btn').forEach(function(btn) {
@@ -1431,6 +1460,17 @@
                 };
                 reader.readAsDataURL(file);
             }
+
+            function clearImage(previewId, inputId, placeholderText) {
+                const previewEl = document.getElementById(previewId);
+                if (previewEl) {
+                    previewEl.innerHTML = '<div class="placeholder">' + placeholderText + '</div>';
+                }
+                const inputEl = document.getElementById(inputId);
+                if (inputEl) {
+                    inputEl.value = '';
+                }
+            }
             
             // Function to generate ID
             function generateId() {
@@ -1461,7 +1501,18 @@
                     }
                 }, 5000);
             }
+            window.addEventListener('beforeunload', function(e){ const internal = localStorage.getItem('internalNav')==='1'; if (localStorage.getItem('sessionActive')==='1' && !internal){ e.preventDefault(); e.returnValue = 'Please logout normally to save data.'; } });
         });
     </script>
+    <div class="modal fade" id="syncModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Uploading Backup</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                <div class="modal-body">
+                    <div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" id="syncProgressBar" role="progressbar" style="width:0%"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
