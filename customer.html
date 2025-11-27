@@ -490,7 +490,7 @@
             </div>
             <div class="nav-item">
                 <a href="company.html" class="nav-link">
-                    <i class="bi bi-building"></i>
+                    <i class="bi bi-briefcase"></i>
                     <span>Company</span>
                 </a>
             </div>
@@ -728,11 +728,18 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize localForage
-            localforage.config({
-                name: 'InvoiceProDB',
-                storeName: 'data'
+            localStorage.removeItem('internalNav');
+            document.addEventListener('click', function(e){
+                const a = e.target.closest('a[href]');
+                if (!a) return;
+                try {
+                    const u = new URL(a.href, window.location.href);
+                    if (u.origin === window.location.origin && u.pathname.endsWith('.html')) {
+                        localStorage.setItem('internalNav','1');
+                    }
+                } catch(_) {}
             });
+            localforage.config({ name: 'InvoiceProDB', storeName: 'data' });
             (function(){
                 const SUPABASE_URL = 'https://nnazbmwzqvzzuyecvlik.supabase.co';
                 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uYXpibXd6cXZ6enV5ZWN2bGlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MzAwNzksImV4cCI6MjA3OTIwNjA3OX0.ENU4UT-QnWL2G1D3Lvpq-YLDgnorqJaeEgChirwaV28';
@@ -790,12 +797,19 @@
                         modalEl.style.display = 'block';
                     }
                 }
-                async function remoteGet(key){ try { if (!sb || remoteTables.indexOf(key)===-1) return null; const { data, error } = await sb.from('app_store').select('value').eq('key', key); if (error) return null; return Array.isArray(data)&&data.length?data[0].value:null; } catch(_) { return null; } }
                 async function remoteUpsert(key,value){ try { if (!sb || remoteTables.indexOf(key)===-1) return; await sb.from('app_store').upsert({ key, value }, { onConflict: 'key' }); } catch(_) {} }
-                const originalGetItem = localforage.getItem.bind(localforage);
-                const originalSetItem = localforage.setItem.bind(localforage);
-                localforage.getItem = async function(key){ const remote = await remoteGet(key); if (remote!==null && remote!==undefined){ await originalSetItem(key, remote); return remote; } return originalGetItem(key); };
-                localforage.setItem = async function(key,value){ await remoteUpsert(key,value); return originalSetItem(key,value); };
+                async function uploadLocalStore(progress){
+                    const keys = await localforage.keys();
+                    const total = keys.length; let done = 0;
+                    for (const k of keys){ const v = await localforage.getItem(k); await remoteUpsert(k,v); done++; if (typeof progress==='function') progress(done/total); }
+                }
+                window.uploadLocalStore = uploadLocalStore;
+                let autoUploadTimer = setInterval(async function(){
+                    try {
+                        const keys = await localforage.keys();
+                        for (const k of keys){ const v = await localforage.getItem(k); await remoteUpsert(k,v); }
+                    } catch(_) {}
+                }, 30000);
                 verifyRemoteSetup();
                 function updateOnlineIndicator(){
                     const el = document.getElementById('onlineIndicator');
@@ -857,9 +871,17 @@
                     document.getElementById('sidebar').classList.toggle('active');
                 });
                 
-                // Logout button
-                document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                document.getElementById('logoutBtn').addEventListener('click', async function(e){
                     e.preventDefault();
+                    const modalEl = document.getElementById('syncModal');
+                    const bar = document.getElementById('syncProgressBar');
+                    const modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+                    try { await (window.uploadLocalStore ? window.uploadLocalStore(function(p){ if (bar) bar.style.width = Math.round(p*100)+'%'; }) : Promise.resolve()); } catch(_) {}
+                    localStorage.removeItem('sessionActive');
+                    await localforage.setItem('authenticated', false);
+                    modal.hide();
+                    localStorage.setItem('internalNav','1');
                     window.location.href = 'index.html';
                 });
                 
@@ -1353,7 +1375,16 @@
                     }
                 }, 5000);
             }
+            window.addEventListener('beforeunload', function(e){ const internal = localStorage.getItem('internalNav')==='1'; if (localStorage.getItem('sessionActive')==='1' && !internal){ e.preventDefault(); e.returnValue = 'Please logout normally to save data.'; } });
         });
     </script>
+    <div class="modal fade" id="syncModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Uploading Backup</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                <div class="modal-body"><div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" id="syncProgressBar" role="progressbar" style="width:0%"></div></div></div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
